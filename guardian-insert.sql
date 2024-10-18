@@ -18,7 +18,6 @@ INSERT INTO Brand (BrandID, BrandName, isTopBrand) VALUES
 ('BRD004', 'Brand D', 0),
 ('BRD005', 'Brand E', 1),
 ('BRD006', 'Brand F', 0),
-('BRD007', 'Brand G', 1);
 
 
 INSERT INTO Category (CategoryID, CategoryName) VALUES 
