@@ -1,4 +1,4 @@
-﻿--CREATE DATABASE QL_Guardian
+﻿CREATE DATABASE QL_Guardian
 USE QL_Guardian
 
 CREATE TABLE Image_
@@ -58,6 +58,9 @@ CREATE TABLE Address_
 	City NVARCHAR (30),
 	Country NVARCHAR(20)
 )
+ALTER TABLE Address_
+ADD FullAddress AS CONCAT(HouseNumber, ' ', Street, ', ', Ward, ', ', District, ', ', City, ', ', Country)
+
 
 CREATE TABLE User_
 (
@@ -74,6 +77,8 @@ CREATE TABLE User_
 	Sex CHAR(3),
 	CONSTRAINT FK_RankID FOREIGN KEY (RankID) REFERENCES Rank_(RankID)
 )
+ALTER TABLE User_
+ADD FullName AS CONCAT(FirstName, ' ', LastName);
 
 CREATE TABLE UserBagProducts --giỏ hàng
 (
@@ -219,5 +224,3 @@ CREATE TABLE Cart
 	CONSTRAINT FK_ProductID6 FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
 	CONSTRAINT FK_UserID6 FOREIGN KEY (UserID) REFERENCES User_(UserID)
 )
-
-

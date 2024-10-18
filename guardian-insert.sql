@@ -9,6 +9,8 @@ INSERT INTO Image_ (ImageID, ImagePath, AltText, BigVersionPath) VALUES
 ('IMG006', '/images/img6.jpg', 'Sample Image 6', '/images/big_img6.jpg'),
 ('IMG007', '/images/img7.jpg', 'Sample Image 7', '/images/big_img7.jpg');
 
+SELECT*FROM Image_
+
 INSERT INTO Brand (BrandID, BrandName, isTopBrand) VALUES 
 ('BRD001', 'Brand A', 1),
 ('BRD002', 'Brand B', 0),
@@ -56,6 +58,7 @@ INSERT INTO Address_ (AddressID, PhoneNumber, HouseNumber, Street, Ward, Distric
 ('ADDR005', '03344556677', '90', 'Fifth Street', 'Ward 5', 'District E', 'City Y', 'Country X'),
 ('ADDR006', '04455667788', '21', 'Sixth Street', 'Ward 6', 'District F', 'City Z', 'Country Z'),
 ('ADDR007', '05566778899', '43', 'Seventh Street', 'Ward 7', 'District G', 'City X', 'Country Y');
+SELECT*FROM Address_
 
 
 INSERT INTO User_ (UserID, FirstName, LastName, PhoneNumber, Email, UserPassword, Point, RankID, TotalOrder, Birthdate, Sex) VALUES 
@@ -66,7 +69,7 @@ INSERT INTO User_ (UserID, FirstName, LastName, PhoneNumber, Email, UserPassword
 ('U005', 'Charlie', 'Davis', '03344556677', 'charlie.d@example.com', 'passdef', 80, 'R005', 4, '1991-05-05', 'M'),
 ('U006', 'David', 'Wilson', '04455667788', 'david.w@example.com', 'passghi', 90, 'R006', 6, '1987-06-06', 'M'),
 ('U007', 'Emily', 'Martinez', '05566778899', 'emily.m@example.com', 'passjkl', 250, 'R007', 11, '1993-07-07', 'F');
-
+SELECT*FROM User_
 
 INSERT INTO UserBagProducts (ProductID, UserID, Quantity) VALUES 
 ('P001', 'U001', 1),
@@ -105,6 +108,7 @@ INSERT INTO Order_ (OrderID, UserID, TotalPrice, OrderStatusID, DateOrdered, Del
 ('O005', 'U005', 500000, 'STATUS002', '2024-10-05', 'ADDR005'),
 ('O006', 'U006', 90000, 'STATUS001', '2024-10-06', 'ADDR006'),
 ('O007', 'U007', 250000, 'STATUS003', '2024-10-07', 'ADDR007');
+
 
 INSERT INTO Review (ReviewID, OrderID, ProductID, UserID, ReviewTime, ReviewContent, Stars) VALUES 
 ('R001', 'O001', 'P001', 'U001', '2024-10-01', 'Great product!', 4.5),
