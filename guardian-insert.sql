@@ -27,7 +27,7 @@ INSERT INTO Category (CategoryID, CategoryName) VALUES
 ('CAT004', 'Books'),
 ('CAT005', 'Toys'),
 ('CAT006', 'Food'),
-('CAT007', 'VietNam')
+
 
 INSERT INTO Rank_ (RankID, RankName) VALUES 
 ('R001', 'Bronze'),
