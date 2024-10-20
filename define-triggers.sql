@@ -80,3 +80,5 @@ INSERT INTO Order_ VALUES ('O012', 'U002', 1500000, 'STATUS001', '2024-10-01', '
 SELECT*FROM Order_
 
 --1Đ = 200VNĐ
+
+--Hello
