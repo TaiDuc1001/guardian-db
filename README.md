@@ -14,6 +14,13 @@ This repository contains SQL scripts for initializing and populating the databas
 
 The Guardian project aims to design and implement the database system for Guardian.com.vn, an e-commerce platform catering to Vietnamese users. The database schema includes tables for products, users, orders, reviews, vouchers, events, and more, ensuring a comprehensive and scalable system to support the platform's operations.
 
+## Links 
+
+[Relational Model](https://docs.google.com/document/d/1C92fLqebUtvI8mGA9hoGQQMfiqWUS9ViZ42HGEA05ks/edit?usp=sharing)
+
+[Relational Table]
+(https://docs.google.com/document/d/1gvgniLRUDQszzrov2mjDCtBJdPWaan30fykE7kwzM3o/edit?tab=t.0)
+
 ## License
 
 This project is licensed under the MIT License.
