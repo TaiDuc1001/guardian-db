@@ -10,15 +10,13 @@ This repository contains SQL scripts for initializing and populating the databas
 
 - [guardian-insert.sql](guardian-insert.sql): This script populates the database with initial data for various tables, including `Image_`, `Brand`, `Category`, `Product`, `Address_`, `User_`, `Event_`, `Voucher`, `Order_`, `ProductOrder`, `Review`, `UserVoucher`, `OrderStatus`, `EventProduct`, `VoucherProduct`, `PaymentTerm`, `Invoice`, `Cart`, `UserBagProducts`, and `LikedProducts`. It includes sample data for testing and development purposes.
 
+[Relational Model](https://docs.google.com/document/d/1C92fLqebUtvI8mGA9hoGQQMfiqWUS9ViZ42HGEA05ks/edit?usp=sharing): This file contains the schema of the database structure reduced to NF3 for construction and education on the database
+
+[Relational Table](https://docs.google.com/document/d/1gvgniLRUDQszzrov2mjDCtBJdPWaan30fykE7kwzM3o/edit?tab=t.0): This file is the backbone of our project, being the resource for the creation of every other file in this repository. It illustrates the schema, structure, triggers and more about the architecture of this model.
+
 ## Project Overview
 
 The Guardian project aims to design and implement the database system for Guardian.com.vn, an e-commerce platform catering to Vietnamese users. The database schema includes tables for products, users, orders, reviews, vouchers, events, and more, ensuring a comprehensive and scalable system to support the platform's operations.
-
-## Links 
-
-[Relational Model](https://docs.google.com/document/d/1C92fLqebUtvI8mGA9hoGQQMfiqWUS9ViZ42HGEA05ks/edit?usp=sharing)
-
-[Relational Table](https://docs.google.com/document/d/1gvgniLRUDQszzrov2mjDCtBJdPWaan30fykE7kwzM3o/edit?tab=t.0)
 
 ## License
 
