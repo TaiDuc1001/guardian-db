@@ -18,8 +18,7 @@ The Guardian project aims to design and implement the database system for Guardi
 
 [Relational Model](https://docs.google.com/document/d/1C92fLqebUtvI8mGA9hoGQQMfiqWUS9ViZ42HGEA05ks/edit?usp=sharing)
 
-[Relational Table]
-(https://docs.google.com/document/d/1gvgniLRUDQszzrov2mjDCtBJdPWaan30fykE7kwzM3o/edit?tab=t.0)
+[Relational Table](https://docs.google.com/document/d/1gvgniLRUDQszzrov2mjDCtBJdPWaan30fykE7kwzM3o/edit?tab=t.0)
 
 ## License
 
