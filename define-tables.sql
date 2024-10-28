@@ -32,7 +32,7 @@ CREATE TABLE Product
 (
 	ProductID VARCHAR(20) NOT NULL PRIMARY KEY,
 	ProductName VARCHAR(50) NOT NULL,
-	RatingStars DECIMAL(2,1),
+	RatingStars DECIMAL(2,1) DEFAULT 0,
 	BrandID VARCHAR(20),
 	SKU varchar(10) UNIQUE,
 	Price DECIMAL(10,0),
