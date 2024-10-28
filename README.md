@@ -18,6 +18,9 @@ This repository contains SQL scripts for initializing and populating the databas
 
 - [Relational Table](https://docs.google.com/document/d/1gvgniLRUDQszzrov2mjDCtBJdPWaan30fykE7kwzM3o/edit?tab=t.0): This file is the backbone of our project, being the resource for the creation of every other file in this repository. It illustrates the schema, structure, triggers and more about the architecture of this model.
 
+- [User Requirement](https://docs.google.com/document/d/1P8LbnGB5ednk2AEeEh1bF8NAE-4VSWtrZiuMPRUK5QM/edit?usp=sharing): This file contains the user requirement for this project, containing the group members, user requirements and relational model along with triggers needed for basic database transactions. 
+
+
 ## Project Overview
 
 The Guardian project aims to design and implement the database system for Guardian.com.vn, an e-commerce platform catering to Vietnamese users. The database schema includes tables for products, users, orders, reviews, vouchers, events, and more, ensuring a comprehensive and scalable system to support the platform's operations.
