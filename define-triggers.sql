@@ -108,7 +108,7 @@ SELECT*FROM Order_
 
 
 GO
-ALTER TABLE Product ADD TongSoSanPhamDaBan INT DEFAULT 0
+ALTER TABLE Product ADD TongSoSanPhamDaBan INT
 SELECT*FROM Product
 DROP TRIGGER UpdateProductSold
 GO
@@ -117,32 +117,29 @@ ON ProductOrder
 FOR INSERT, UPDATE
 AS
 BEGIN
-	UPDATE Product SET TongSoSanPhamDaBan =  
-	(
-		SELECT SUM(po.Quantity)
-		FROM ProductOrder po, Product pro, inserted ins
-		WHERE po.ProductID = pro.ProductID
-		AND ins.ProductID = po.ProductID
-	)
-	FROM inserted ins, Product pro, ProductOrder po
-	WHERE pro.ProductID = ins.ProductID
-	AND po.ProductID = ins.ProductID
+	UPDATE Product
+	SET TongSoSanPhamDaBan = TongSoSanPhamDaBan + ins.Quantity
+	FROM Product pro
+	INNER JOIN inserted ins on ins.ProductID = pro.ProductID
 END
 SELECT*FROM Product
 SELECT*FROM Order_
 SELECT*FROM ProductOrder
+
 INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
-('O010', 'P001', 'V001', 1, 10000, 1490000)
+('O002', 'P007', 'V006', 1, 10000, 1490000)
 INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
-('O011', 'P002', 'V001', 10, 10000, 1490000)
+('O001', 'P006', 'V007', 1, 10000, 1490000)
 INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
-('O012', 'P003', 'V001', 10, 10000, 1490000)
+('O004', 'P005', 'V004', 1, 10000, 1490000)
 INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
-('O013', 'P004', 'V001', 10, 10000, 1490000)
+('O007', 'P004', 'V005', 1, 10000, 1490000)
 INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
-('O014', 'P005', 'V001', 10, 10000, 1490000)
+('O012', 'P003', 'V001', 1, 10000, 1490000)
 INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
-('O015', 'P006', 'V001', 10, 10000, 1490000)
+('O002', 'P002', 'V003', 1, 10000, 1490000)
+INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
+('O003', 'P001', 'V002', 1, 10000, 1490000)
 
 
 
