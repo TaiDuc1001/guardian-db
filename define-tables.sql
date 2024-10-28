@@ -43,6 +43,7 @@ CREATE TABLE Product
 	InstructionManualDescription TEXT, 
 	InstructionStoreDescription TEXT,
 	StockQuantity INT,
+	SoldCount INT,
 	CONSTRAINT FK_CategoryID FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID),
 	CONSTRAINT FK_BrandID FOREIGN KEY (BrandID) REFERENCES Brand(BrandID)
 )
@@ -51,13 +52,14 @@ CREATE TABLE Address_
 (
 	AddressID VARCHAR(20) NOT NULL PRIMARY KEY,
 	PhoneNumber VARCHAR(11) NOT NULL UNIQUE,
-	HouseNumber VARCHAR(10),
-	Street NVARCHAR(50),
-	Ward NVARCHAR(30),
-	District NVARCHAR(20),
-	City NVARCHAR (30),
-	Country NVARCHAR(20)
+	HouseNumber VARCHAR(10) NOT NULL,
+	Street NVARCHAR(50) NOT NULL,
+	Ward NVARCHAR(30) NOT NULL,
+	District NVARCHAR(20) NOT NULL,
+	City NVARCHAR (30) NOT NULL,
+	Country NVARCHAR(20) NOT NULL
 )
+
 ALTER TABLE Address_
 ADD FullAddress AS CONCAT(HouseNumber, ' ', Street, ', ', Ward, ', ', District, ', ', City, ', ', Country)
 
@@ -66,10 +68,11 @@ CREATE TABLE User_
 (
 	UserID VARCHAR(20) NOT NULL PRIMARY KEY,
 	FirstName NVARCHAR(10),
+	MiddleName NVARCHAR(10),
 	LastName NVARCHAR(10),
 	PhoneNumber VARCHAR(11) NOT NULL UNIQUE,
-	Email VARCHAR(50),
-	UserPassword VARCHAR(30),
+	Email VARCHAR(50) NOT NULL UNIQUE,
+	UserPassword VARCHAR(30) NOT NULL,
 	Point INT,
 	RankID varchar(20),
 	TotalOrder INT,
@@ -78,7 +81,7 @@ CREATE TABLE User_
 	CONSTRAINT FK_RankID FOREIGN KEY (RankID) REFERENCES Rank_(RankID)
 )
 ALTER TABLE User_
-ADD FullName AS CONCAT(FirstName, ' ', LastName);
+ADD FullName AS CONCAT(LastName, ' ', MiddleName, ' ', FirstName);
 
 CREATE TABLE UserBagProducts --giỏ hàng
 (
@@ -115,7 +118,6 @@ CREATE TABLE Order_
 	OrderID VARCHAR(20) NOT NULL PRIMARY KEY,
 	UserID VARCHAR(20),
 	TotalPrice DECIMAL(20,0),
-	OrderStatusID VARCHAR(20),
 	DateOrdered DATE,
 	DeliveryAddressID VARCHAR(20),
 	CONSTRAINT FK_UserID3 FOREIGN KEY (UserID) REFERENCES User_(UserID),
@@ -151,7 +153,30 @@ CREATE TABLE OrderStatus
 	StatusName NVARCHAR(15)
 )
 
+CREATE TABLE Shipper
+(
+	ID VARCHAR(20) NOT NULL PRIMARY KEY,
+	Salary MONEY,
+	FirstName NVARCHAR(10),
+	MiddleName NVARCHAR(10),
+	LastName NVARCHAR(10),
+	PhoneNumber VARCHAR(11) NOT NULL UNIQUE,
+	Email VARCHAR(50) NOT NULL UNIQUE,
+	Password VARCHAR(30) NOT NULL,
+	TotalOrder INT
+)
 
+CREATE TABLE ShipperOrder
+(
+	OrderID VARCHAR(20),
+	ShipperID VARCHAR(20),
+	StatusID VARCHAR(20),
+	Time DATETIME,
+	CONSTRAINT FK_OrderID2_ShipperID PRIMARY KEY (OrderID, ShipperID, StatusID, Time),
+	CONSTRAINT FK_OrderID2 FOREIGN KEY (OrderID) REFERENCES Order_(OrderID),
+	CONSTRAINT FK_ShipperID FOREIGN KEY (ShipperID) REFERENCES Shipper(ID)
+	CONSTRAINT FK_StatusID FOREIGN KEY (StatusID) REFERENCES OrderStatus(StatusID)
+)
 
 CREATE TABLE ProductOrder
 (
@@ -223,4 +248,21 @@ CREATE TABLE Cart
 	CONSTRAINT FK_ProductID6_UserID6 PRIMARY KEY (ProductID, UserID),
 	CONSTRAINT FK_ProductID6 FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
 	CONSTRAINT FK_UserID6 FOREIGN KEY (UserID) REFERENCES User_(UserID)
+)
+
+CREATE TABLE Genre
+(
+	ID VARCHAR(20) NOT NULL PRIMARY KEY,
+	GenreName NVARCHAR(50) NOT NULL
+)
+
+CREATE TABLE News
+(
+	ID VARCHAR(20) NOT NULL PRIMARY KEY,
+	PublishedDate DATE,
+	GenreID VARCHAR(20) NOT NULL,
+	HTMLPath VARCHAR(100),
+	ThumbnailID VARCHAR(20),
+	CONSTRAINT FK_GenreID FOREIGN KEY (GenreID) REFERENCES Genre(ID),
+	CONSTRAINT FK_ThumbnailID FOREIGN KEY (ThumbnailID) REFERENCES Image_(ImageID)
 )
