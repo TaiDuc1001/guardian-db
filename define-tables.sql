@@ -100,7 +100,6 @@ CREATE TABLE Address
 	Type NVARCHAR(20) DEFAULT N'Nhà riêng',
 	CONSTRAINT FK_UserID2 FOREIGN KEY (UserID) REFERENCES User_(UserID)
 )
-
 ALTER TABLE Address
 ADD FullAddress AS CONCAT(HouseNumber, ' ', Street, ', ', Ward, ', ', District, ', ', City, ', ', Country)
 
@@ -109,9 +108,15 @@ CREATE TABLE OrderStatus
 (
 	StatusID VARCHAR(20) NOT NULL PRIMARY KEY,
 	StatusName NVARCHAR(50) 
-	CHECK (StatusName IN (N'Đã đặt hàng', N'Đã xác nhận', N'Đang giao hàng', N'Đã giao hàng', N'Đã hủy'))
+	CHECK (StatusName IN (
+		N'Đã đặt hàng', 
+		N'Đã xác nhận', 
+		N'Đang giao hàng', 
+		N'Đã giao hàng', 
+		N'Đã hủy'
+		)
+	)
 )
-
 
 CREATE TABLE Voucher
 (
@@ -156,7 +161,6 @@ ADD FullName AS CONCAT(
 	COALESCE(FirstName, '')
 )
 
-
 CREATE TABLE Order_
 (
 	OrderID VARCHAR(20) NOT NULL PRIMARY KEY,
@@ -167,7 +171,6 @@ CREATE TABLE Order_
 	CONSTRAINT FK_UserID3 FOREIGN KEY (UserID) REFERENCES User_(UserID),
 	CONSTRAINT FK_AddressID FOREIGN KEY (DeliveryAddressID) REFERENCES Address(AddressID)
 )
-
 
 CREATE TABLE CentralWarehouse
 (
@@ -240,7 +243,6 @@ CREATE TABLE LikedProducts -- sản phẩm đã thích
 	Constraint FK_UserID1 FOREIGN KEY(UserID) REFERENCES User_(UserID)
 )
 
-
 CREATE TABLE ReviewOf
 (
 	ReviewID VARCHAR(20),
@@ -263,7 +265,6 @@ CREATE TABLE UserVoucher
 	CONSTRAINT FK_VoucherID FOREIGN KEY (VoucherID) REFERENCES Voucher(VoucherID),
 	Constraint FK_UserID2 FOREIGN KEY(UserID) REFERENCES User_(UserID)
 )
-
 
 
 CREATE TABLE ShipperOrder
