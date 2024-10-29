@@ -13,25 +13,13 @@ GO
 CREATE TABLE Category
 (
 	CategoryID VARCHAR(20) NOT NULL PRIMARY KEY,
-	CategoryName VARCHAR(50) NOT NULL CHECK (
-		CategoryName IN (
-			N'Chăm sóc da mặt',
-			N'Chăm sóc da cơ thể',
-			N'Chăm sóc tóc'
-		)
-	)
+	CategoryName NVARCHAR(50) NOT NULL
 )
 
 CREATE TABLE Brand
 (
 	BrandID VARCHAR(20) NOT NULL PRIMARY KEY,
-	BrandName NVARCHAR(50) NOT NULL CHECK (
-		BrandName IN (
-			N'P/S',
-			N'Sensodyne',
-			N'Listerine'
-		)
-	),
+	BrandName NVARCHAR(50) NOT NULL,
 	isTopBrand TINYINT
 )	
 
@@ -52,7 +40,7 @@ CREATE TABLE Rank
 CREATE TABLE Product
 (
 	ProductID VARCHAR(20) NOT NULL PRIMARY KEY,
-	ProductName VARCHAR(50) NOT NULL,
+	ProductName NVARCHAR(50) NOT NULL,
 	RatingStars DECIMAL(2,1) DEFAULT 0,
 	BrandID VARCHAR(20),
 	SKU varchar(10) UNIQUE,
@@ -61,7 +49,7 @@ CREATE TABLE Product
 	Ingredients NVARCHAR(100),
 	DescriptionProduct TEXT,
 	Uses TEXT,
-	Unit VARCHAR(10),
+	Unit NVARCHAR(10),
 	InstructionManualDescription TEXT, 
 	InstructionStoreDescription TEXT,
 	SoldCount INT,
@@ -311,11 +299,11 @@ CREATE TABLE ProductOrder
 (
 	OrderID VARCHAR(20),
 	ProductID VARCHAR(20),
-	VoucherID VARCHAR(20),
+	VoucherID VARCHAR(20) DEFAULT 'V000',
 	Quantity SMALLINT DEFAULT 1,
 	DiscountedAmount INT DEFAULT 0,
 	FinalPrice INT,
-	CONSTRAINT FK_OrderID_ProductID2_VoucherID1 PRIMARY KEY (OrderID, ProductID, VoucherID),
+	CONSTRAINT FK_OrderID_ProductID2_VoucherID1 PRIMARY KEY (OrderID, ProductID),
 	CONSTRAINT FK_OrderID FOREIGN KEY (OrderID) REFERENCES Order_(OrderID),
 	CONSTRAINT FK_ProductID8 FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
 	CONSTRAINT FK_VoucherID1 FOREIGN KEY (VoucherID) REFERENCES Voucher(VoucherID)
@@ -343,7 +331,7 @@ CREATE TABLE VoucherProducts
 CREATE TABLE PaymentTerm
 (
 	PaymentTermID VARCHAR(20) NOT NULL PRIMARY KEY,
-	PaymentTermName NVARCHAR(20)
+	PaymentTermName NVARCHAR(100)
 	CHECK (PaymentTermName IN (
 		N'Thanh toán khi nhận hàng', 
 		N'Thanh toán qua thẻ ngân hàng', 
