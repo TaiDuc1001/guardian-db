@@ -4,20 +4,40 @@ USE QL_Guardian
 CREATE TABLE Category
 (
 	CategoryID VARCHAR(20) NOT NULL PRIMARY KEY,
-	CategoryName VARCHAR(50)
+	CategoryName VARCHAR(50) NOT NULL CHECK (
+		CategoryName IN (
+			N'Chăm sóc da mặt',
+			N'Chăm sóc da cơ thể',
+			N'Chăm sóc tóc'
+		)
+	)
 )
 
 CREATE TABLE Brand
 (
 	BrandID VARCHAR(20) NOT NULL PRIMARY KEY,
-	BrandName NVARCHAR(50),
+	BrandName NVARCHAR(50) NOT NULL CHECK (
+		BrandName IN (
+			N'P/S',
+			N'Sensodyne',
+			N'Listerine'
+		)
+	),
 	isTopBrand TINYINT
 )	
 
 CREATE TABLE Rank
 (
 	RankID varchar(20) NOT NULL PRIMARY KEY,
-	RankName varchar(15)
+	RankName varchar(15) NOT NULL CHECK (
+		RankName IN (
+			'Đồng',
+			'Bạc',
+			'Vàng',
+			'Platinum',
+			'Kim cương'
+		)
+	),
 )
 
 CREATE TABLE Product
