@@ -74,6 +74,7 @@ CREATE TABLE User_
 	FirstName NVARCHAR(10) NOT NULL,
 	MiddleName NVARCHAR(10) NOT NULL,
 	LastName NVARCHAR(10) NOT NULL,
+	FullName AS CONCAT(LastName, ' ', MiddleName, ' ', FirstName),
 	PhoneNumber VARCHAR(11) NOT NULL UNIQUE,
 	Email VARCHAR(50) NOT NULL UNIQUE,
 	UserPassword VARCHAR(30) NOT NULL,
@@ -83,14 +84,6 @@ CREATE TABLE User_
 	Birthdate DATE,	
 	Sex CHAR(3),
 	CONSTRAINT FK_RankID FOREIGN KEY (RankID) REFERENCES Rank(RankID)
-)
-ALTER TABLE User_
-ADD FullName AS CONCAT(
-	COALESCE(LastName, ''),
-	' ',
-	COALESCE(MiddleName, ''),
-	' ',
-	COALESCE(FirstName, '')
 )
 
 CREATE TABLE Event
@@ -111,13 +104,12 @@ CREATE TABLE Address
 	District NVARCHAR(20) NOT NULL,
 	City NVARCHAR (30) NOT NULL,
 	Country NVARCHAR(20) NOT NULL,
+	FullAddress AS CONCAT(HouseNumber, ' ', Street, ', ', Ward, ', ', District, ', ', City, ', ', Country),
 	UserID VARCHAR(20),
 	isDefault TINYINT DEFAULT 0,
 	Type NVARCHAR(20) DEFAULT N'Nhà riêng',
 	CONSTRAINT FK_UserID1 FOREIGN KEY (UserID) REFERENCES User_(UserID)
 )
-ALTER TABLE Address
-ADD FullAddress AS CONCAT(HouseNumber, ' ', Street, ', ', Ward, ', ', District, ', ', City, ', ', Country)
 
 
 CREATE TABLE OrderStatus
@@ -163,18 +155,17 @@ CREATE TABLE Shipper
 	FirstName NVARCHAR(10),
 	MiddleName NVARCHAR(10),
 	LastName NVARCHAR(10),
+	FullName AS CONCAT(
+		COALESCE(LastName, ''),
+		' ',
+		COALESCE(MiddleName, ''),
+		' ',
+		COALESCE(FirstName, '')
+	),
 	PhoneNumber VARCHAR(11) NOT NULL UNIQUE,
 	Email VARCHAR(50) NOT NULL UNIQUE,
 	Password VARCHAR(30) NOT NULL,
 	TotalOrder INT
-)
-ALTER TABLE Shipper
-ADD FullName AS CONCAT(
-	COALESCE(LastName, ''),
-	' ',
-	COALESCE(MiddleName, ''),
-	' ',
-	COALESCE(FirstName, '')
 )
 
 CREATE TABLE Order_
@@ -184,8 +175,17 @@ CREATE TABLE Order_
 	TotalPrice DECIMAL(20,0),
 	DateOrdered DATE,
 	DeliveryAddressID VARCHAR(20),
+	VoucherID VARCHAR(20) DEFAULT 'V000',
+	ShippingFee DECIMAL(20,0) DEFAULT 20000,
+	ShippingVATAmount DECIMAL(20,0) DEFAULT 2000,
+	ShippingFeeIncludeVAT AS (ShippingFee + ShippingVATAmount),
+	DiscountedAmount DECIMAL(20,0) DEFAULT 0,
+	FinalAmount DECIMAL(20,0) DEFAULT 0,
+	FinalVATAmount DECIMAL(20,0) DEFAULT 0,
+	FinalAmountIncludeVAT DECIMAL(20,0) DEFAULT 0,
 	CONSTRAINT FK_UserID2 FOREIGN KEY (UserID) REFERENCES User_(UserID),
-	CONSTRAINT FK_AddressID FOREIGN KEY (DeliveryAddressID) REFERENCES Address(AddressID)
+	CONSTRAINT FK_AddressID FOREIGN KEY (DeliveryAddressID) REFERENCES Address(AddressID),
+	CONSTRAINT FK_VoucherID1 FOREIGN KEY (VoucherID) REFERENCES Voucher(VoucherID)
 )
 
 CREATE TABLE CentralWarehouse
@@ -299,14 +299,13 @@ CREATE TABLE ProductOrder
 (
 	OrderID VARCHAR(20),
 	ProductID VARCHAR(20),
-	VoucherID VARCHAR(20) DEFAULT 'V000',
 	Quantity SMALLINT DEFAULT 1,
-	DiscountedAmount INT DEFAULT 0,
-	FinalPrice INT,
+	Amount DECIMAL(20,0) DEFAULT 0,
+	VATAmount DECIMAL(20,0) DEFAULT 0,
+	AmountIncludeVAT DECIMAL(20,0) DEFAULT 0,
 	CONSTRAINT FK_OrderID_ProductID2_VoucherID1 PRIMARY KEY (OrderID, ProductID),
 	CONSTRAINT FK_OrderID FOREIGN KEY (OrderID) REFERENCES Order_(OrderID),
-	CONSTRAINT FK_ProductID8 FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
-	CONSTRAINT FK_VoucherID1 FOREIGN KEY (VoucherID) REFERENCES Voucher(VoucherID)
+	CONSTRAINT FK_ProductID8 FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 )
 
 CREATE TABLE EventProducts
