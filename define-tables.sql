@@ -47,11 +47,11 @@ CREATE TABLE Product
 	Price DECIMAL(10,0),
 	CategoryID VARCHAR(20),
 	Ingredients NVARCHAR(100),
-	DescriptionProduct TEXT,
-	Uses TEXT,
+	DescriptionProduct NVARCHAR(500),
+	Uses NVARCHAR(500),
 	Unit NVARCHAR(10),
-	InstructionManualDescription TEXT, 
-	InstructionStoreDescription TEXT,
+	InstructionManualDescription NVARCHAR(500), 
+	InstructionStoreDescription NVARCHAR(500),
 	SoldCount INT,
 	CONSTRAINT FK_CategoryID FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID),
 	CONSTRAINT FK_BrandID FOREIGN KEY (BrandID) REFERENCES Brand(BrandID)
@@ -61,7 +61,7 @@ CREATE TABLE Image
 (
 	ImageID VARCHAR(20) NOT NULL PRIMARY KEY,
 	ImagePath VARCHAR(100),
-	AltText TEXT,
+	AltText NVARCHAR(500),
 	BigVersionPath VARCHAR(100),
 	ProductID VARCHAR(20),
 	OrdinalNumber INT,
@@ -134,7 +134,7 @@ CREATE TABLE Voucher
 	MinimumPrice INT DEFAULT 0,
 	DiscountPrice INT,
 	DiscountPercentage DECIMAL(2,0),
-	VoucherDescription TEXT,
+	VoucherDescription NVARCHAR(500),
 	EventID VARCHAR(20),
 	CONSTRAINT FK_EventID1 FOREIGN KEY (EventID) REFERENCES Event(EventID)
 )
@@ -143,7 +143,7 @@ CREATE TABLE Review
 (
 	ReviewID VARCHAR(20) NOT NULL PRIMARY KEY,
 	ReviewTime DATE,
-	ReviewMessage TEXT,
+	ReviewMessage NVARCHAR(500),
 	Stars DECIMAL(3,1)
 )
 
@@ -347,7 +347,7 @@ CREATE TABLE Invoice
 	BrandID VARCHAR(20),
 	UserID VARCHAR(20),
 	PaymentTermID VARCHAR(20),
-	Note TEXT,
+	Note NVARCHAR(500),
 	CONSTRAINT FK_BrandID1 FOREIGN KEY (BrandID) REFERENCES Brand (BrandID),
 	CONSTRAINT FK_UserID7 FOREIGN KEY (UserID) REFERENCES User_(UserID),
 	CONSTRAINT FK_PaymentTermID FOREIGN KEY (PaymentTermID) REFERENCES PaymentTerm (PaymentTermID)
