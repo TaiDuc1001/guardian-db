@@ -10,6 +10,14 @@ EXEC sp_executesql @SQL;
 EXEC sp_MSforeachtable 'ALTER TABLE ? CHECK CONSTRAINT ALL';
 
 GO
+
+INSERT INTO Rate (RateID, RateName, RateValue)
+VALUES 
+    ('TAX001', N'VAT', 0.10),
+    ('TAX002', N'Nhập', 0.05),
+    ('TAX003', N'Xuất', 0.10),
+    ('TAX004', N'GUARDIAN', 0.15);
+
 INSERT INTO Category (CategoryID, CategoryName)
 VALUES 
     ('C001', N'Chăm sóc da mặt'),
@@ -421,10 +429,3 @@ VALUES
     ('NEWS005', '2024-01-14', 'GEN005', 'path/to/news5.html', 'I005'),
     ('NEWS006', '2024-01-15', 'GEN006', 'path/to/news6.html', 'I006'),
     ('NEWS007', '2024-01-16', 'GEN001', 'path/to/news7.html', 'I006');
-
-INSERT INTO Rate (RateID, RateName, RateValue)
-VALUES 
-    ('TAX001', N'VAT', 0.10),
-    ('TAX002', N'Nhập', 0.05),
-    ('TAX003', N'Xuất', 0.10),
-    ('TAX004', N'GUARDIAN', 0.15);
