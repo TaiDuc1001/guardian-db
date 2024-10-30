@@ -47,12 +47,12 @@ CREATE TABLE Product
 	Price DECIMAL(10,0),
 	CategoryID VARCHAR(20),
 	Ingredients NVARCHAR(100),
-	DescriptionProduct TEXT,
-	Uses TEXT,
+	DescriptionProduct NVARCHAR(500),
+	Uses NVARCHAR(500),
 	Unit NVARCHAR(10),
-	InstructionManualDescription TEXT, 
-	InstructionStoreDescription TEXT,
-	SoldCount INT,
+	InstructionManualDescription NVARCHAR(500), 
+	InstructionStoreDescription NVARCHAR(500),
+	SoldCount INT DEFAULT 0,
 	CONSTRAINT FK_CategoryID FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID),
 	CONSTRAINT FK_BrandID FOREIGN KEY (BrandID) REFERENCES Brand(BrandID)
 )
@@ -61,7 +61,7 @@ CREATE TABLE Image
 (
 	ImageID VARCHAR(20) NOT NULL PRIMARY KEY,
 	ImagePath VARCHAR(100),
-	AltText TEXT,
+	AltText NVARCHAR(500),
 	BigVersionPath VARCHAR(100),
 	ProductID VARCHAR(20),
 	OrdinalNumber INT,
@@ -130,20 +130,27 @@ CREATE TABLE Voucher
 (
 	VoucherID VARCHAR(20) NOT NULL PRIMARY KEY,
 	VoucherCode VARCHAR(20) NOT NULL,
-	Name VARCHAR(50),
-	MinimumPrice INT DEFAULT 0,
-	DiscountPrice INT,
-	DiscountPercentage DECIMAL(2,0),
-	VoucherDescription TEXT,
+	Name NVARCHAR(50),
+	MinimumDiscount DECIMAL(20,2) DEFAULT 0,
+	MaximumDiscountAmount DECIMAL(20,2) DEFAULT 0,
+	DiscountPrice INT DEFAULT NULL,
+	DiscountPercentage DECIMAL(2,0) DEFAULT NULL,
+	VoucherDescription NVARCHAR(500),
 	EventID VARCHAR(20),
-	CONSTRAINT FK_EventID1 FOREIGN KEY (EventID) REFERENCES Event(EventID)
+	CONSTRAINT FK_EventID1 FOREIGN KEY (EventID) REFERENCES Event(EventID),
+	CONSTRAINT CK_Discount CHECK (
+        (DiscountPrice IS NOT NULL OR DiscountPercentage IS NOT NULL) 
+        AND (DiscountPrice IS NULL OR DiscountPercentage IS NULL)
+		AND (DiscountPrice IS NULL OR DiscountPrice >= 0)
+		AND (DiscountPercentage IS NULL OR (DiscountPercentage >= 0 AND DiscountPercentage <= 100))
+    )
 )
 
 CREATE TABLE Review
 (
 	ReviewID VARCHAR(20) NOT NULL PRIMARY KEY,
 	ReviewTime DATE,
-	ReviewMessage TEXT,
+	ReviewMessage NVARCHAR(500),
 	Stars DECIMAL(3,1)
 )
 
@@ -171,17 +178,18 @@ CREATE TABLE Shipper
 CREATE TABLE Order_
 (
 	OrderID VARCHAR(20) NOT NULL PRIMARY KEY,
-	UserID VARCHAR(20),
-	TotalPrice DECIMAL(20,0) DEFAULT 0,
+	UserID VARCHAR(20) NOT NULL,
+	PointUsed INT DEFAULT 0,
+	TotalPrice DECIMAL(20,2) DEFAULT 0,
 	DateOrdered DATE,
 	DeliveryAddressID VARCHAR(20),
 	VoucherID VARCHAR(20) DEFAULT 'V000',
-	ShippingFee DECIMAL(20,0) DEFAULT 20000,
-	ShippingVATAmount DECIMAL(20,0) DEFAULT 2000,
+	ShippingFee DECIMAL(20,2) DEFAULT 20000,
+	ShippingVATAmount DECIMAL(20,2) DEFAULT 2000,
 	ShippingFeeIncludeVAT AS (ShippingFee + ShippingVATAmount),
-	FinalAmount DECIMAL(20,0) DEFAULT 0,
-	FinalVATAmount DECIMAL(20,0) DEFAULT 0,
-	FinalAmountIncludeVAT DECIMAL(20,0) DEFAULT 0,
+	FinalAmount DECIMAL(20,2) DEFAULT 0,
+	FinalVATAmount DECIMAL(20,2) DEFAULT 0,
+	FinalAmountIncludeVAT DECIMAL(20,2) DEFAULT 0,
 	CONSTRAINT FK_UserID2 FOREIGN KEY (UserID) REFERENCES User_(UserID),
 	CONSTRAINT FK_AddressID FOREIGN KEY (DeliveryAddressID) REFERENCES Address(AddressID),
 	CONSTRAINT FK_VoucherID1 FOREIGN KEY (VoucherID) REFERENCES Voucher(VoucherID)
@@ -299,8 +307,8 @@ CREATE TABLE ProductOrder
 	OrderID VARCHAR(20),
 	ProductID VARCHAR(20),
 	Quantity SMALLINT DEFAULT 1,
-	Amount DECIMAL(20,0) DEFAULT 0,
-	VATAmount DECIMAL(20,0) DEFAULT 0,
+	Amount DECIMAL(20,2) DEFAULT 0,
+	VATAmount DECIMAL(20,2) DEFAULT 0,
 	AmountIncludeVAT AS (Amount + VATAmount),
 	CONSTRAINT FK_OrderID_ProductID2_VoucherID1 PRIMARY KEY (OrderID, ProductID),
 	CONSTRAINT FK_OrderID FOREIGN KEY (OrderID) REFERENCES Order_(OrderID),
@@ -344,11 +352,9 @@ CREATE TABLE Invoice
 	InvoiceNumber INT,
 	InvoiceDate DATE DEFAULT GETDATE(),
 	MCQT VARCHAR(20) NOT NULL,
-	BrandID VARCHAR(20),
 	UserID VARCHAR(20),
 	PaymentTermID VARCHAR(20),
-	Note TEXT,
-	CONSTRAINT FK_BrandID1 FOREIGN KEY (BrandID) REFERENCES Brand (BrandID),
+	Note NVARCHAR(500),
 	CONSTRAINT FK_UserID7 FOREIGN KEY (UserID) REFERENCES User_(UserID),
 	CONSTRAINT FK_PaymentTermID FOREIGN KEY (PaymentTermID) REFERENCES PaymentTerm (PaymentTermID)
 )
@@ -391,5 +397,5 @@ CREATE TABLE Rate
 			N'GUARDIAN'
 		)
 	),
-	RateValue DECIMAL(3,2)
+	RateValue DECIMAL(20,2)
 )

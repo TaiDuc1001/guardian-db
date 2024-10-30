@@ -185,23 +185,46 @@ BEGIN
 END
 GO
 
-CREATE TRIGGER SetTotalPrice
+
+CREATE TRIGGER SetProductAmounts
 ON ProductOrder
 AFTER INSERT
 AS
 BEGIN
+	DECLARE @TotalAmount INT
+	DECLARE @ProductID VARCHAR(20)
 	DECLARE @OrderID VARCHAR(20)
+	DECLARE @Quantity INT
+	DECLARE @VATRate DECIMAL(20,2)
 	DECLARE @TotalPrice INT
 
+
 	DECLARE ins_cursor CURSOR FOR
-	SELECT ins.OrderID
+	SELECT ins.ProductID, ins.Quantity, ins.OrderID
 	FROM inserted ins
 
 	OPEN ins_cursor
-	FETCH NEXT FROM ins_cursor INTO @OrderID
+	FETCH NEXT FROM ins_cursor INTO @ProductID, @Quantity, @OrderID
 
-	WHILE @@FETCH_STATUS = 0
+	WHILE @@FETCH_STATUS = 0 
 	BEGIN
+		SET @TotalAmount =
+		(
+			SELECT p.Price
+			FROM Product p
+			WHERE @ProductID = p.ProductID
+		) * @Quantity
+
+		SET @VATRate = (
+			SELECT RateValue
+			FROM Rate r
+			WHERE r.RateID LIKE '%TAX001%'
+		) 
+
+		UPDATE ProductOrder
+		SET Amount = @TotalAmount, VATAmount = @VATRate * @TotalAmount
+		WHERE ProductID = @ProductID AND OrderID = @OrderID
+
 		SET @TotalPrice = 
 		(
 			SELECT SUM(po.Amount)
@@ -212,9 +235,10 @@ BEGIN
 		UPDATE Order_
 		SET TotalPrice = @TotalPrice
 		WHERE OrderID = @OrderID
-		FETCH NEXT FROM ins_cursor INTO @OrderID
+
+		FETCH NEXT FROM ins_cursor INTO @ProductID, @Quantity, @OrderID
 	END
-	CLOSE ins_cursor 
+	CLOSE ins_cursor
 	DEALLOCATE ins_cursor
 END
 GO
