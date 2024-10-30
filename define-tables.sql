@@ -26,7 +26,7 @@ CREATE TABLE Brand
 CREATE TABLE Rank
 (
 	RankID varchar(20) NOT NULL PRIMARY KEY,
-	RankName varchar(15) NOT NULL CHECK (
+	RankName nvarchar(15) NOT NULL CHECK (
 		RankName IN (
 			N'Đồng',
 			N'Bạc',
