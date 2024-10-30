@@ -162,3 +162,37 @@ BEGIN
 	END
 END
 GO
+
+CREATE TRIGGER SetTotalPrice
+ON ProductOrder
+AFTER INSERT
+AS
+BEGIN
+	DECLARE @OrderID VARCHAR(20)
+	DECLARE @TotalPrice INT
+
+	DECLARE ins_cursor CURSOR FOR
+	SELECT ins.OrderID
+	FROM inserted ins
+
+	OPEN ins_cursor
+	FETCH NEXT FROM ins_cursor INTO @OrderID
+
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		SET @TotalPrice = 
+		(
+			SELECT SUM(po.Amount)
+			FROM ProductOrder po 
+			WHERE po.OrderID = @OrderID
+		)
+
+		UPDATE Order_
+		SET TotalPrice = @TotalPrice
+		WHERE OrderID = @OrderID
+		FETCH NEXT FROM ins_cursor INTO @OrderID
+	END
+	CLOSE ins_cursor 
+	DEALLOCATE ins_cursor
+END
+GO

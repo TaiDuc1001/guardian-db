@@ -26,7 +26,7 @@ CREATE TABLE Brand
 CREATE TABLE Rank
 (
 	RankID varchar(20) NOT NULL PRIMARY KEY,
-	RankName varchar(15) NOT NULL CHECK (
+	RankName nvarchar(15) NOT NULL CHECK (
 		RankName IN (
 			N'Đồng',
 			N'Bạc',
@@ -172,14 +172,13 @@ CREATE TABLE Order_
 (
 	OrderID VARCHAR(20) NOT NULL PRIMARY KEY,
 	UserID VARCHAR(20),
-	TotalPrice DECIMAL(20,0),
+	TotalPrice DECIMAL(20,0) DEFAULT 0,
 	DateOrdered DATE,
 	DeliveryAddressID VARCHAR(20),
 	VoucherID VARCHAR(20) DEFAULT 'V000',
 	ShippingFee DECIMAL(20,0) DEFAULT 20000,
 	ShippingVATAmount DECIMAL(20,0) DEFAULT 2000,
 	ShippingFeeIncludeVAT AS (ShippingFee + ShippingVATAmount),
-	DiscountedAmount DECIMAL(20,0) DEFAULT 0,
 	FinalAmount DECIMAL(20,0) DEFAULT 0,
 	FinalVATAmount DECIMAL(20,0) DEFAULT 0,
 	FinalAmountIncludeVAT DECIMAL(20,0) DEFAULT 0,
@@ -302,7 +301,7 @@ CREATE TABLE ProductOrder
 	Quantity SMALLINT DEFAULT 1,
 	Amount DECIMAL(20,0) DEFAULT 0,
 	VATAmount DECIMAL(20,0) DEFAULT 0,
-	AmountIncludeVAT DECIMAL(20,0) DEFAULT 0,
+	AmountIncludeVAT AS (Amount + VATAmount),
 	CONSTRAINT FK_OrderID_ProductID2_VoucherID1 PRIMARY KEY (OrderID, ProductID),
 	CONSTRAINT FK_OrderID FOREIGN KEY (OrderID) REFERENCES Order_(OrderID),
 	CONSTRAINT FK_ProductID8 FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
