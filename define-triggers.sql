@@ -78,22 +78,14 @@ ON [dbo].[ProductOrder]
 AFTER INSERT, UPDATE
 AS
 BEGIN
-	UPDATE [dbo].[ProductOrder]
-	SET [DiscountedAmount] = (
-      p.[Price] * po.[Quantity]) * (v.[DiscountPercentage]/100.0)
-      FROM ProductOrder po 
-      JOIN Voucher v ON po.[VoucherID] = v.[VoucherID]
-      JOIN Product p ON po.[ProductID] = p.[ProductID]
-      WHERE po.[OrderID] IN (SELECT[OrderID] FROM inserted
-    )
-
-	UPDATE[dbo].[ProductOrder]
-	SET [FinalPrice] = (
-      p.[Price] * po.[Quantity]) - po.[DiscountedAmount]
-      FROM ProductOrder po
-      JOIN Product p ON po.[ProductID] = p.[ProductID]
-      WHERE po.[OrderID] IN (SELECT[OrderID] FROM inserted
-    )
+	UPDATE ProductOrder
+	SET Amount = ins.Quantity * pro.Price,
+		VATAmount = (ins.Quantity * pro.Price)*0.1,
+		AmountIncludeVAT = (ins.Quantity * pro.Price) * (1 + 0.1)
+	FROM ProductOrder po, Product pro, inserted ins
+	WHERE pro.ProductID = ins.ProductID
+	AND po.ProductID = ins.ProductID
+	AND pro.ProductID = po.ProductID	
 END
 GO
 
@@ -168,5 +160,39 @@ BEGIN
 			ROLLBACK
 		END
 	END
+END
+GO
+
+CREATE TRIGGER SetTotalPrice
+ON ProductOrder
+AFTER INSERT
+AS
+BEGIN
+	DECLARE @OrderID VARCHAR(20)
+	DECLARE @TotalPrice INT
+
+	DECLARE ins_cursor CURSOR FOR
+	SELECT ins.OrderID
+	FROM inserted ins
+
+	OPEN ins_cursor
+	FETCH NEXT FROM ins_cursor INTO @OrderID
+
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		SET @TotalPrice = 
+		(
+			SELECT SUM(po.Amount)
+			FROM ProductOrder po 
+			WHERE po.OrderID = @OrderID
+		)
+
+		UPDATE Order_
+		SET TotalPrice = @TotalPrice
+		WHERE OrderID = @OrderID
+		FETCH NEXT FROM ins_cursor INTO @OrderID
+	END
+	CLOSE ins_cursor 
+	DEALLOCATE ins_cursor
 END
 GO
