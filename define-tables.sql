@@ -179,7 +179,6 @@ CREATE TABLE Order_
 	ShippingFee DECIMAL(20,0) DEFAULT 20000,
 	ShippingVATAmount DECIMAL(20,0) DEFAULT 2000,
 	ShippingFeeIncludeVAT AS (ShippingFee + ShippingVATAmount),
-	DiscountedAmount DECIMAL(20,0) DEFAULT 0,
 	FinalAmount DECIMAL(20,0) DEFAULT 0,
 	FinalVATAmount DECIMAL(20,0) DEFAULT 0,
 	FinalAmountIncludeVAT DECIMAL(20,0) DEFAULT 0,
