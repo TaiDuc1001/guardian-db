@@ -1,5 +1,15 @@
 ﻿USE QL_Guardian
+GO
 
+DECLARE @SQL NVARCHAR(MAX) = '';
+
+-- Generate the drop trigger statements
+SELECT @SQL = @SQL + 'DROP TRIGGER [' + OBJECT_SCHEMA_NAME(t.parent_id) + '].[' + t.name + ']; '
+FROM sys.triggers AS t
+JOIN sys.tables AS tbl ON t.parent_id = tbl.object_id;
+
+-- Execute the generated SQL to drop all triggers
+EXEC sp_executesql @SQL;
 GO
 
 CREATE TRIGGER UpdateProductInventory
@@ -10,49 +20,59 @@ BEGIN
 	DECLARE @ProductID VARCHAR(20);
 	DECLARE @OrderedQuantity INT; 
 	DECLARE @CurrentStockQuantity INT;
+	DECLARE @OrderID VARCHAR(20);
+	DECLARE @AddressID VARCHAR(20);
+	DECLARE @BranchWID VARCHAR(20);
 
 	DECLARE product_cur CURSOR FOR
-	SELECT ins.ProductID, ins.Quantity
+	SELECT ins.ProductID, ins.Quantity, ins.OrderID
 	FROM inserted ins
 
 	OPEN product_cur
 
-	FETCH NEXT FROM product_cur INTO @ProductID, @OrderedQuantity;
+	FETCH NEXT FROM product_cur INTO @ProductID, @OrderedQuantity, @OrderID
 
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
+		SET @AddressID = 
+		(
+			SELECT o.DeliveryAddressID
+			FROM Order_ o
+			WHERE o.OrderID = @OrderID
+		)
+		SET @BranchWID = 
+		(
+			SELECT bw.BranchWID
+			FROM BranchWarehouse bw
+			WHERE bw.AddressID = @AddressID
+		)
 		SET @CurrentStockQuantity = 
 			(
-				SELECT pro.StockQuantity
-				FROM Product pro
-				WHERE ProductID = @ProductID
+				SELECT bwp.StockQuantity
+				FROM BranchW_Product bwp
+				WHERE bwp.ProductID = @ProductID AND bwp.BranchWID = @BranchWID
 			)
 		IF @CurrentStockQuantity >= @OrderedQuantity
 		BEGIN
-			UPDATE Product
+			UPDATE BranchW_Product
 			SET StockQuantity = StockQuantity - @OrderedQuantity
-			WHERE ProductID = @ProductID
+			WHERE ProductID = @ProductID AND BranchWID = @BranchWID
 		END
 		ELSE
 		BEGIN
-			UPDATE Product
+			UPDATE BranchW_Product
 			SET StockQuantity = 0
-			WHERE ProductID = @ProductID
+			WHERE ProductID = @ProductID AND BranchWID = @BranchWID
 			PRINT N'Sản phẩm ' + @ProductID + N' không đủ so với số lượng tồn kho.';
 			ROLLBACK 
 		END
-		FETCH NEXT FROM product_cur INTO @ProductID, @OrderedQuantity
+		FETCH NEXT FROM product_cur INTO @ProductID, @OrderedQuantity, @OrderID
 	END
 	CLOSE product_cur
 	DEALLOCATE product_cur
 END
-
-SELECT * FROM Product
-SELECT * FROM ProductOrder
-INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
-('O007', 'P001', 'V001', 96, 10000, 1490000)
-
 GO
+
 CREATE TRIGGER CalculateDiscountedAmount
 ON [dbo].[ProductOrder]
 AFTER INSERT, UPDATE
@@ -75,13 +95,6 @@ BEGIN
       WHERE po.[OrderID] IN (SELECT[OrderID] FROM inserted
     )
 END
-
-INSERT INTO ProductOrder(OrderID, ProductID, VoucherID, Quantity) VALUES ('O007','P004','V002', 4)
-SELECT*FROM ProductOrder
-
-SELECT*FROM Voucher
-
-
 GO
 
 CREATE TRIGGER UpdatePoints
@@ -98,20 +111,9 @@ BEGIN
 	UPDATE [dbo].[User_]
     SET [Point] = ROUND([Point] + @TotalPrice / 10000, -1)
     WHERE [UserID] = @UserID;
-    
 END
-SELECT*FROM User_
-INSERT INTO Order_ VALUES ('O012', 'U002', 1500000, 'STATUS001', '2024-10-01', 'ADDR001')
-SELECT*FROM Order_
-
-
-
-
 GO
-ALTER TABLE Product ADD TongSoSanPhamDaBan INT
-SELECT*FROM Product
-DROP TRIGGER UpdateProductSold
-GO
+
 CREATE TRIGGER UpdateProductSold
 ON ProductOrder
 FOR INSERT, UPDATE
@@ -125,26 +127,46 @@ END
 SELECT*FROM Product
 SELECT*FROM Order_
 SELECT*FROM ProductOrder
+GO
 
-INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
-('O002', 'P007', 'V006', 1, 10000, 1490000)
-INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
-('O001', 'P006', 'V007', 1, 10000, 1490000)
-INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
-('O004', 'P005', 'V004', 1, 10000, 1490000)
-INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
-('O007', 'P004', 'V005', 1, 10000, 1490000)
-INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
-('O012', 'P003', 'V001', 1, 10000, 1490000)
-INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
-('O002', 'P002', 'V003', 1, 10000, 1490000)
-INSERT INTO ProductOrder (OrderID, ProductID, VoucherID, Quantity, DiscountedAmount, FinalPrice) VALUES 
-('O003', 'P001', 'V002', 1, 10000, 1490000)
+CREATE TRIGGER HandleVoucherMismatch
+ON Order_
+AFTER INSERT
+AS
+BEGIN
+	DECLARE @OrderID VARCHAR(20);
+	DECLARE @VoucherID VARCHAR(20);
+	DECLARE @ProductID VARCHAR(20);
+	DECLARE @VoucherProductID VARCHAR(20);
 
+	DECLARE ins_cursor CURSOR FOR 
+	SELECT ins.OrderID, ins.VoucherID
+	FROM inserted ins
 
+	OPEN ins_cursor 
+	FETCH NEXT FROM ins_currsor INTO @OrderID, @VoucherID;
 
---1Đ = 200VNĐ
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		SET @ProductID = 
+		(
+			SELECT po.ProductID
+			FROM ProductOrder po
+			WHERE po.OrderID = @OrderID
+		)
 
---Hello
+		SET @VoucherProductID = 
+		(
+			SELECT vp.ProductID
+			FROM VoucherProducts vp
+			WHERE vp.VoucherID = @VoucherID
+		)
 
---helooooo
+		IF @ProductID != @VoucherProductID
+		BEGIN
+			PRINT N'VOUCHER NÀY KHÔNG HỢP LỆ'
+			ROLLBACK
+		END
+	END
+END
+GO
