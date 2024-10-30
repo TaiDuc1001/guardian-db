@@ -28,11 +28,11 @@ CREATE TABLE Rank
 	RankID varchar(20) NOT NULL PRIMARY KEY,
 	RankName varchar(15) NOT NULL CHECK (
 		RankName IN (
-			'Đồng',
-			'Bạc',
-			'Vàng',
-			'Platinum',
-			'Kim cương'
+			N'Đồng',
+			N'Bạc',
+			N'Vàng',
+			N'Platinum',
+			N'Kim cương'
 		)
 	),
 )
