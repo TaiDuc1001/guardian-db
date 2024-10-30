@@ -52,7 +52,7 @@ CREATE TABLE Product
 	Unit NVARCHAR(10),
 	InstructionManualDescription NVARCHAR(500), 
 	InstructionStoreDescription NVARCHAR(500),
-	SoldCount INT,
+	SoldCount INT DEFAULT 0,
 	CONSTRAINT FK_CategoryID FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID),
 	CONSTRAINT FK_BrandID FOREIGN KEY (BrandID) REFERENCES Brand(BrandID)
 )
@@ -178,7 +178,7 @@ CREATE TABLE Shipper
 CREATE TABLE Order_
 (
 	OrderID VARCHAR(20) NOT NULL PRIMARY KEY,
-	UserID VARCHAR(20),
+	UserID VARCHAR(20) NOT NULL,
 	TotalPrice DECIMAL(20,2) DEFAULT 0,
 	DateOrdered DATE,
 	DeliveryAddressID VARCHAR(20),
