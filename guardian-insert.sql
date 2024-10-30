@@ -201,27 +201,28 @@ VALUES
 
      
 INSERT INTO Voucher (
-    VoucherID, VoucherCode, Name, MinimumPrice, DiscountPrice, 
-    DiscountPercentage, VoucherDescription, EventID
+    VoucherID, VoucherCode, Name, MinimumDiscount, MaximumDiscountAmount, 
+    DiscountPrice, DiscountPercentage, VoucherDescription, EventID
 )
 VALUES
-    ('V000', 'NoDiscount', N'Default value', NULL, NULL, 
-     0, N'LORUM LORUM', 'E001'),
+    ('V000', 'NoDiscount', N'Default value', 0, NULL, 
+     NULL, 0, N'LORUM LORUM', 'E001'),
 
-    ('V001', 'KM10', N'Giảm giá 10%', 200000, 10000, 
-     10, N'Mã giảm giá 10% cho đơn hàng từ 200.000đ.', 'E001'),
+    ('V001', 'KM10', N'Giảm giá 10%', 200000, 1000000, 
+     NULL, 10, N'Mã giảm giá 10% cho đơn hàng từ 200.000đ.', 'E001'),
      
-    ('V002', 'KM20', N'Giảm giá 20%', 300000, 50000, 
-     20, N'Mã giảm giá 50.000đ cho đơn hàng từ 300.000đ.', 'E002'),
+    ('V002', 'KM20', N'Giảm giá 20%', 300000, NULL, 
+     50000, NULL, N'Mã giảm giá 50.000đ cho đơn hàng từ 300.000đ.', 'E002'),
      
-    ('V003', 'KM15', N'Giảm giá 15%', 150000, 20000, 
-     15, N'Mã giảm giá 15% cho đơn hàng từ 150.000đ.', 'E003'),
+    ('V003', 'KM15', N'Giảm giá 15%', 150000, 800000, 
+     NULL, 15, N'Mã giảm giá 15% cho đơn hàng từ 150.000đ.', 'E003'),
      
-    ('V004', 'KM5', N'Giảm giá 5%', 50000, 5000, 
-     5, N'Mã giảm giá 5.000đ cho đơn hàng từ 50.000đ.', 'E004'),
+    ('V004', 'KM5', N'Giảm giá 5%', 50000, NULL, 
+     5000, NULL, N'Mã giảm giá 5.000đ cho đơn hàng từ 50.000đ.', 'E004'),
      
-    ('V005', 'KM30', N'Giảm giá 30%', 400000, 120000, 
-     30, N'Mã giảm giá 120.000đ cho đơn hàng từ 400.000đ.', 'E005');
+    ('V005', 'KM30', N'Giảm giá 30%', 400000, 2000000, 
+     NULL, 30, N'Mã giảm giá 120.000đ cho đơn hàng từ 400.000đ.', 'E005');
+
 
 INSERT INTO Review (
     ReviewID, ReviewTime, ReviewMessage, Stars

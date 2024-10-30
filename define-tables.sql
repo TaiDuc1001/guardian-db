@@ -130,13 +130,20 @@ CREATE TABLE Voucher
 (
 	VoucherID VARCHAR(20) NOT NULL PRIMARY KEY,
 	VoucherCode VARCHAR(20) NOT NULL,
-	Name VARCHAR(50),
-	MinimumPrice INT DEFAULT 0,
-	DiscountPrice INT,
-	DiscountPercentage DECIMAL(2,0),
+	Name NVARCHAR(50),
+	MinimumDiscount INT DEFAULT 0,
+	MaximumDiscountAmount INT DEFAULT 0,
+	DiscountPrice INT DEFAULT NULL,
+	DiscountPercentage DECIMAL(2,0) DEFAULT NULL,
 	VoucherDescription NVARCHAR(500),
 	EventID VARCHAR(20),
-	CONSTRAINT FK_EventID1 FOREIGN KEY (EventID) REFERENCES Event(EventID)
+	CONSTRAINT FK_EventID1 FOREIGN KEY (EventID) REFERENCES Event(EventID),
+	CONSTRAINT CK_Discount CHECK (
+        (DiscountPrice IS NOT NULL OR DiscountPercentage IS NOT NULL) 
+        AND (DiscountPrice IS NULL OR DiscountPercentage IS NULL)
+		AND (DiscountPrice IS NULL OR DiscountPrice >= 0)
+		AND (DiscountPercentage IS NULL OR (DiscountPercentage >= 0 AND DiscountPercentage <= 100))
+    )
 )
 
 CREATE TABLE Review
