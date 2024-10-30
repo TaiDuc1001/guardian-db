@@ -78,22 +78,14 @@ ON [dbo].[ProductOrder]
 AFTER INSERT, UPDATE
 AS
 BEGIN
-	UPDATE [dbo].[ProductOrder]
-	SET [DiscountedAmount] = (
-      p.[Price] * po.[Quantity]) * (v.[DiscountPercentage]/100.0)
-      FROM ProductOrder po 
-      JOIN Voucher v ON po.[VoucherID] = v.[VoucherID]
-      JOIN Product p ON po.[ProductID] = p.[ProductID]
-      WHERE po.[OrderID] IN (SELECT[OrderID] FROM inserted
-    )
-
-	UPDATE[dbo].[ProductOrder]
-	SET [FinalPrice] = (
-      p.[Price] * po.[Quantity]) - po.[DiscountedAmount]
-      FROM ProductOrder po
-      JOIN Product p ON po.[ProductID] = p.[ProductID]
-      WHERE po.[OrderID] IN (SELECT[OrderID] FROM inserted
-    )
+	UPDATE ProductOrder
+	SET Amount = ins.Quantity * pro.Price,
+		VATAmount = (ins.Quantity * pro.Price)*0.1,
+		AmountIncludeVAT = (ins.Quantity * pro.Price) * (1 + 0.1)
+	FROM ProductOrder po, Product pro, inserted ins
+	WHERE pro.ProductID = ins.ProductID
+	AND po.ProductID = ins.ProductID
+	AND pro.ProductID = po.ProductID	
 END
 GO
 
