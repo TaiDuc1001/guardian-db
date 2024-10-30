@@ -407,12 +407,12 @@ VALUES
     ('PT003', N'Thanh toán qua ví điện tử');
 
 INSERT INTO Invoice (
-    InvoiceKey, Serial, InvoiceNumber, InvoiceDate, MCQT, BrandID, UserID, PaymentTermID, Note
+    InvoiceKey, Serial, InvoiceNumber, InvoiceDate, MCQT, UserID, PaymentTermID, Note
 )
 VALUES 
-    ('INV001', 'SER123456', 1001, GETDATE(), 'MCQT001', 'B001', 'U001', 'PT001', N'Ghi chú hóa đơn 001'),
-    ('INV002', 'SER123457', 1002, GETDATE(), 'MCQT002', 'B002', 'U002', 'PT002', N'Ghi chú hóa đơn 002'),
-    ('INV003', 'SER123458', 1003, GETDATE(), 'MCQT003', 'B001', 'U003', 'PT003', N'Ghi chú hóa đơn 003');
+    ('INV001', 'SER123456', 1001, GETDATE(), 'MCQT001', 'U001', 'PT001', N'Ghi chú hóa đơn 001'),
+    ('INV002', 'SER123457', 1002, GETDATE(), 'MCQT002', 'U002', 'PT002', N'Ghi chú hóa đơn 002'),
+    ('INV003', 'SER123458', 1003, GETDATE(), 'MCQT003', 'U003', 'PT003', N'Ghi chú hóa đơn 003');
 
 INSERT INTO Genre (ID, GenreName)
 VALUES 
