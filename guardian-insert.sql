@@ -360,6 +360,8 @@ VALUES
 
 INSERT INTO ProductOrder (OrderID, ProductID, Quantity) VALUES
     ('O001', 'P001', 2),
+    ('O001', 'P002', 3),
+    ('O001', 'P003', 1),
     ('O002', 'P002', 1),
     ('O003', 'P003', 3),
     ('O004', 'P004', 1),
