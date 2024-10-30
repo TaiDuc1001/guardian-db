@@ -420,9 +420,9 @@ VALUES
     ('NEWS006', '2024-01-15', 'GEN006', 'path/to/news6.html', 'I006'),
     ('NEWS007', '2024-01-16', 'GEN001', 'path/to/news7.html', 'I006');
 
-INSERT INTO Tax (TaxID, TaxName, TaxRate)
+INSERT INTO Rate (RateID, RateName, RateValue)
 VALUES 
     ('TAX001', N'VAT', 0.10),
     ('TAX002', N'Nhập', 0.05),
-    ('TAX003', N'Xuất', 0.07),
+    ('TAX003', N'Xuất', 0.10),
     ('TAX004', N'GUARDIAN', 0.15);
