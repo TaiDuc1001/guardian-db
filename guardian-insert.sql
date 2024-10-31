@@ -61,7 +61,7 @@ INSERT INTO Product (
     InstructionStoreDescription
 )
 VALUES 
-    ('P000', N'Special Product', 'B001', 'SKU001', 0, 'C001', 
+    ('P000', N'Special Product', 'B001', 'SKU010', 0, 'C001', 
      N'', 
      N'', 
      N'', 
