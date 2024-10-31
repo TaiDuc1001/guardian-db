@@ -94,51 +94,29 @@ ON Order_
 AFTER INSERT
 AS
 BEGIN
-	DECLARE @OrderID VARCHAR(20);
-	DECLARE @VoucherID VARCHAR(20);
-	DECLARE @ProductID VARCHAR(20);
-	DECLARE @VoucherProductID VARCHAR(20);
+	IF EXISTS
+	(
+		SELECT 1
+		FROM inserted ins
+		JOIN ProductOrder po ON po.OrderID = ins.OrderID
+		JOIN VoucherProducts vps ON vps.VoucherID = ins.VoucherID
+		WHERE po.ProductID != vps.ProductID
+	)
 
-	DECLARE ins_cursor CURSOR FOR 
-	SELECT ins.OrderID, ins.VoucherID
-	FROM inserted ins
-
-	OPEN ins_cursor 
-	FETCH NEXT FROM ins_currsor INTO @OrderID, @VoucherID;
-
-	WHILE @@FETCH_STATUS = 0
 	BEGIN
-		SET @ProductID = 
-		(
-			SELECT po.ProductID
-			FROM ProductOrder po
-			WHERE po.OrderID = @OrderID
-		)
-
-		SET @VoucherProductID = 
-		(
-			SELECT vp.ProductID
-			FROM VoucherProducts vp
-			WHERE vp.VoucherID = @VoucherID
-		)
-
-		IF @ProductID != @VoucherProductID
-		BEGIN
-			PRINT N'VOUCHER NÀY KHÔNG HỢP LỆ'
-			ROLLBACK
-		END
+		PRINT N'Voucher này không hợp lệ'
+		ROLLBACK
 	END
 END
-GO
-
+go
 CREATE TRIGGER TriggerOrder
 ON Order_
 AFTER INSERT, UPDATE
 AS 
 BEGIN
-    UPDATE User
+    UPDATE User_
     SET Point = ROUND(Point + ins.TotalPrice/10000, -1)
-    FROM User u
+    FROM User_ u
     INNER JOIN inserted ins ON u.UserID = ins.UserID
 
     DELETE Cart
