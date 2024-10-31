@@ -74,23 +74,6 @@ END
 GO
 
 
-CREATE TRIGGER UpdatePoints
-ON Order_
-AFTER INSERT, UPDATE
-AS
-BEGIN
-    DECLARE @TotalPrice DECIMAL(18,2);
-    DECLARE @UserID VARCHAR(20);
-
-   
-    SELECT @TotalPrice = o.TotalPrice, @UserID = o.[UserID]
-    FROM inserted o; 
-	UPDATE User_
-    SET [Point] = ROUND([Point] + @TotalPrice / 10000, -1)
-    WHERE [UserID] = @UserID;
-END
-GO
-
 CREATE TRIGGER UpdateProductSold
 ON ProductOrder
 FOR INSERT, UPDATE
@@ -145,6 +128,22 @@ BEGIN
 			ROLLBACK
 		END
 	END
+END
+GO
+
+CREATE TRIGGER TriggerOrder
+ON Order_
+AFTER INSERT, UPDATE
+AS 
+BEGIN
+    UPDATE User
+    SET Point = ROUND(Point + ins.TotalPrice/10000, -1)
+    FROM User u
+    INNER JOIN inserted ins ON u.UserID = ins.UserID
+
+    DELETE Cart
+    FROM Cart c
+    INNER JOIN inserted ins ON c.UserID = ins.UserID
 END
 GO
 
