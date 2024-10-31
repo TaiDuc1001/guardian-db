@@ -61,6 +61,14 @@ INSERT INTO Product (
     InstructionStoreDescription
 )
 VALUES 
+    ('P000', N'Special Product', 'B001', 'SKU001', 0, 'C001', 
+     N'', 
+     N'', 
+     N'', 
+     N'', 
+     N'', 
+     N''),
+
     ('P001', N'Sữa rửa mặt', 'B001', 'SKU001', 120000, 'C001', 
      N'Nước, Glycerin, Hương liệu', 
      N'Sữa rửa mặt nhẹ nhàng cho việc sử dụng hàng ngày.', 
