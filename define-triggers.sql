@@ -1,4 +1,4 @@
-﻿USE QL_Guardian
+﻿﻿USE QL_Guardian
 GO
 
 DECLARE @SQL NVARCHAR(MAX) = '';
@@ -73,60 +73,6 @@ BEGIN
 END
 GO
 
-CREATE TRIGGER CalculateVATAmounts
-ON ProductOrder
-AFTER INSERT, UPDATE
-AS
-BEGIN
-    DECLARE @OrderID VARCHAR(20), @ProductID VARCHAR(20), @Quantity INT, @Price DECIMAL(10, 0)
-    DECLARE @Amount DECIMAL(20, 0), @VATAmount DECIMAL(20, 0), @AmountIncludeVAT DECIMAL(20, 0)
-    
-    DECLARE cursor_order CURSOR FOR 
-        SELECT OrderID, ProductID, Quantity
-        FROM inserted
-
-    OPEN cursor_order
-
-    FETCH NEXT FROM cursor_order INTO @OrderID, @ProductID, @Quantity
-
-    WHILE @@FETCH_STATUS = 0
-    BEGIN
-        -- Giả sử lấy giá từ bảng Product, bạn cần sửa nếu cần
-        SELECT @Price = Price FROM Product WHERE ProductID = @ProductID
-        SET @Amount = @Quantity * @Price
-        SET @VATAmount = @Amount * 0.1
-        SET @AmountIncludeVAT = @Amount + @VATAmount
-
-        UPDATE ProductOrder
-        SET Amount = @Amount,
-            VATAmount = @VATAmount
-        WHERE OrderID = @OrderID AND ProductID = @ProductID
-
-        FETCH NEXT FROM cursor_order INTO @OrderID, @ProductID, @Quantity
-    END
-
-    CLOSE cursor_order
-    DEALLOCATE cursor_order
-END
-
-GO
-
-CREATE TRIGGER UpdatePoints
-ON Order_
-AFTER INSERT, UPDATE
-AS
-BEGIN
-    DECLARE @TotalPrice DECIMAL(18,2);
-    DECLARE @UserID VARCHAR(20);
-
-   
-    SELECT @TotalPrice = o.TotalPrice, @UserID = o.[UserID]
-    FROM inserted o; 
-	UPDATE User_
-    SET [Point] = ROUND([Point] + @TotalPrice / 10000, -1)
-    WHERE [UserID] = @UserID;
-END
-GO
 
 CREATE TRIGGER UpdateProductSold
 ON ProductOrder
@@ -185,60 +131,59 @@ BEGIN
 END
 GO
 
+CREATE TRIGGER TriggerOrder
+ON Order_
+AFTER INSERT, UPDATE
+AS 
+BEGIN
+    UPDATE User
+    SET Point = ROUND(Point + ins.TotalPrice/10000, -1)
+    FROM User u
+    INNER JOIN inserted ins ON u.UserID = ins.UserID
 
-CREATE TRIGGER SetProductAmounts
+    DELETE Cart
+    FROM Cart c
+    INNER JOIN inserted ins ON c.UserID = ins.UserID
+END
+GO
+
+CREATE TRIGGER ProductOrderTrigger
 ON ProductOrder
-AFTER INSERT
+AFTER INSERT, UPDATE
 AS
 BEGIN
-	DECLARE @TotalAmount INT
-	DECLARE @ProductID VARCHAR(20)
-	DECLARE @OrderID VARCHAR(20)
-	DECLARE @Quantity INT
 	DECLARE @VATRate DECIMAL(20,2)
-	DECLARE @TotalPrice INT
-
-
-	DECLARE ins_cursor CURSOR FOR
-	SELECT ins.ProductID, ins.Quantity, ins.OrderID
-	FROM inserted ins
-
-	OPEN ins_cursor
-	FETCH NEXT FROM ins_cursor INTO @ProductID, @Quantity, @OrderID
-
-	WHILE @@FETCH_STATUS = 0 
-	BEGIN
-		SET @TotalAmount =
+	SET @VATRate = 
 		(
-			SELECT p.Price
-			FROM Product p
-			WHERE @ProductID = p.ProductID
-		) * @Quantity
-
-		SET @VATRate = (
 			SELECT RateValue
 			FROM Rate r
 			WHERE r.RateID LIKE '%TAX001%'
 		) 
 
-		UPDATE ProductOrder
-		SET Amount = @TotalAmount, VATAmount = @VATRate * @TotalAmount
-		WHERE ProductID = @ProductID AND OrderID = @OrderID
+	UPDATE po
+	SET po.Amount = ins.Quantity * p.Price, po.VATAmount = po.Amount * @VATRate
+	FROM ProductOrder po
+	INNER JOIN inserted ins ON po.ProductID = ins.ProductID AND po.OrderID = ins.OrderID
+	INNER JOIN Product p ON ins.ProductID = p.ProductID
 
-		SET @TotalPrice = 
-		(
-			SELECT SUM(po.Amount)
-			FROM ProductOrder po 
-			WHERE po.OrderID = @OrderID
-		)
+	UPDATE o
+	SET o.TotalPrice = (
+            SELECT SUM(po.Amount)
+            FROM ProductOrder po
+            WHERE po.OrderID = o.OrderID AND po.OrderID != 'P000'
+        ),
+		o.FinalAmount = o.TotalPrice + (SELECT po.Amount
+            FROM ProductOrder po
+            WHERE po.OrderID = o.OrderID AND po.OrderID = 'P000')
 
-		UPDATE Order_
-		SET TotalPrice = @TotalPrice
-		WHERE OrderID = @OrderID
+	FROM Order_ o
+	INNER JOIN
+		inserted ins ON o.OrderID = ins.OrderID
 
-		FETCH NEXT FROM ins_cursor INTO @ProductID, @Quantity, @OrderID
-	END
-	CLOSE ins_cursor
-	DEALLOCATE ins_cursor
+	UPDATE pro
+		SET pro.SoldCount = pro.SoldCount + ins.Quantity
+		FROM Product pro
+		INNER JOIN inserted ins on ins.ProductID = pro.ProductID
+
 END
 GO
