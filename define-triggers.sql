@@ -74,21 +74,6 @@ END
 GO
 
 
-CREATE TRIGGER UpdateProductSold
-ON ProductOrder
-FOR INSERT, UPDATE
-AS
-BEGIN
-	UPDATE Product
-	SET TongSoSanPhamDaBan = TongSoSanPhamDaBan + ins.Quantity
-	FROM Product pro
-	INNER JOIN inserted ins on ins.ProductID = pro.ProductID
-END
-SELECT*FROM Product
-SELECT*FROM Order_
-SELECT*FROM ProductOrder
-GO
-
 CREATE TRIGGER HandleVoucherMismatch
 ON Order_
 AFTER INSERT
@@ -108,8 +93,9 @@ BEGIN
 		ROLLBACK
 	END
 END
-go
-CREATE TRIGGER TriggerOrder
+GO
+
+CREATE TRIGGER OrderTrigger
 ON Order_
 AFTER INSERT, UPDATE
 AS 
@@ -149,11 +135,7 @@ BEGIN
             SELECT SUM(po.Amount)
             FROM ProductOrder po
             WHERE po.OrderID = o.OrderID AND po.OrderID != 'P000'
-        ),
-		o.FinalAmount = o.TotalPrice + (SELECT po.Amount
-            FROM ProductOrder po
-            WHERE po.OrderID = o.OrderID AND po.OrderID = 'P000')
-
+        )
 	FROM Order_ o
 	INNER JOIN
 		inserted ins ON o.OrderID = ins.OrderID
@@ -207,5 +189,13 @@ BEGIN
 	WHERE 
 		o.OrderID IN (SELECT OrderID FROM inserted)
 		AND NOT EXISTS (SELECT 1 FROM ProductOrder po WHERE po.OrderID = o.OrderID AND po.ProductID = 'P000')
+
+	UPDATE o
+	SET o.FinalAmount = o.TotalPrice + (SELECT po.Amount
+            FROM ProductOrder po
+            WHERE po.OrderID = o.OrderID AND po.ProductID = 'P000')
+	FROM Order_ o
+	INNER JOIN
+		inserted ins ON o.OrderID = ins.OrderID
 END
 GO
