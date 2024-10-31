@@ -365,19 +365,19 @@ VALUES
     ('O004', 'SH002', 'S004', '2024-10-05 12:30:00'),
     ('O005', 'SH003', 'S005', '2024-10-06 13:45:00');
 
-INSERT INTO ProductOrder (OrderID, ProductID, Quantity) VALUES
-    ('O001', 'P001', 2),
-    ('O001', 'P002', 3),
-    ('O001', 'P003', 1),
-    ('O002', 'P002', 1),
-    ('O003', 'P003', 3),
-    ('O004', 'P004', 1),
-    ('O005', 'P005', 2),
-    ('O006', 'P006', 1),
-    ('O007', 'P007', 4),
-    ('O008', 'P008', 3),
-    ('O009', 'P007', 2),
-    ('O010', 'P008', 1);
+INSERT INTO ProductOrder (OrderID, ProductID, StockAddressID, Quantity) VALUES
+    ('O001', 'P001', 'BW001', 2),
+    ('O001', 'P002', 'BW001', 3),
+    ('O001', 'P003', 'BW002', 1),
+    ('O002', 'P002', 'BW001', 1),
+    ('O003', 'P003', 'BW002', 3),
+    ('O004', 'P004', 'BW003', 1),
+    ('O005', 'P005', 'BW004', 2),
+    ('O006', 'P006', 'BW005', 1),
+    ('O007', 'P007', 'BW006', 4),
+    ('O008', 'P008', 'BW007', 3),
+    ('O009', 'P007', 'BW007', 2),
+    ('O010', 'P008', 'BW007', 1);
 
 INSERT INTO EventProducts (
     EventID, ProductID, DiscountPercent
