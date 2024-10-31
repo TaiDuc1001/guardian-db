@@ -1,4 +1,4 @@
-﻿USE QL_Guardian
+﻿﻿USE QL_Guardian
 GO
 
 DECLARE @SQL NVARCHAR(MAX) = '';
