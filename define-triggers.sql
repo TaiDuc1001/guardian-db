@@ -1,5 +1,4 @@
-﻿﻿USE QL_Guardian
-GO
+﻿
 
 DECLARE @SQL NVARCHAR(MAX) = '';
 
@@ -17,59 +16,45 @@ ON ProductOrder
 AFTER INSERT
 AS
 BEGIN
-	DECLARE @ProductID VARCHAR(20);
-	DECLARE @OrderedQuantity INT; 
-	DECLARE @CurrentStockQuantity INT;
-	DECLARE @OrderID VARCHAR(20);
-	DECLARE @AddressID VARCHAR(20);
-	DECLARE @BranchWID VARCHAR(20);
+    UPDATE bwp
+    SET bwp.StockQuantity = bwp.StockQuantity - ins.Quantity
+    FROM BranchW_Product bwp
+    INNER JOIN inserted ins ON bwp.ProductID = ins.ProductID
+    INNER JOIN Order_ o ON ins.OrderID = o.OrderID
+    INNER JOIN BranchWarehouse bw ON o.DeliveryAddressID = bw.AddressID AND bwp.BranchWID = bw.BranchWID
+    WHERE bwp.StockQuantity >= ins.Quantity
 
-	DECLARE product_cur CURSOR FOR
-	SELECT ins.ProductID, ins.Quantity, ins.OrderID
-	FROM inserted ins
+    IF EXISTS (
+        SELECT 1
+        FROM BranchW_Product bwp
+        INNER JOIN inserted ins ON bwp.ProductID = ins.ProductID
+        INNER JOIN Order_ o ON ins.OrderID = o.OrderID
+        INNER JOIN BranchWarehouse bw ON o.DeliveryAddressID = bw.AddressID AND bwp.BranchWID = bw.BranchWID
+        WHERE bwp.StockQuantity < ins.Quantity
+    )
+    BEGIN
+        DECLARE @OutOfStockProducts TABLE (ProductID VARCHAR(20))
 
-	OPEN product_cur
+        INSERT INTO @OutOfStockProducts (ProductID)
+        SELECT bwp.ProductID
+        FROM BranchW_Product bwp
+        INNER JOIN inserted ins ON bwp.ProductID = ins.ProductID
+        INNER JOIN Order_ o ON ins.OrderID = o.OrderID
+        INNER JOIN BranchWarehouse bw ON o.DeliveryAddressID = bw.AddressID AND bwp.BranchWID = bw.BranchWID
+        WHERE bwp.StockQuantity < ins.Quantity
 
-	FETCH NEXT FROM product_cur INTO @ProductID, @OrderedQuantity, @OrderID
+        UPDATE bwp
+        SET bwp.StockQuantity = 0
+        FROM BranchW_Product bwp
+        INNER JOIN @OutOfStockProducts oos ON bwp.ProductID = oos.ProductID
 
-	WHILE @@FETCH_STATUS = 0
-	BEGIN
-		SET @AddressID = 
-		(
-			SELECT o.DeliveryAddressID
-			FROM Order_ o
-			WHERE o.OrderID = @OrderID
-		)
-		SET @BranchWID = 
-		(
-			SELECT bw.BranchWID
-			FROM BranchWarehouse bw
-			WHERE bw.AddressID = @AddressID
-		)
-		SET @CurrentStockQuantity = 
-			(
-				SELECT bwp.StockQuantity
-				FROM BranchW_Product bwp
-				WHERE bwp.ProductID = @ProductID AND bwp.BranchWID = @BranchWID
-			)
-		IF @CurrentStockQuantity >= @OrderedQuantity
-		BEGIN
-			UPDATE BranchW_Product
-			SET StockQuantity = StockQuantity - @OrderedQuantity
-			WHERE ProductID = @ProductID AND BranchWID = @BranchWID
-		END
-		ELSE
-		BEGIN
-			UPDATE BranchW_Product
-			SET StockQuantity = 0
-			WHERE ProductID = @ProductID AND BranchWID = @BranchWID
-			PRINT N'Sản phẩm ' + @ProductID + N' không đủ so với số lượng tồn kho.';
-			ROLLBACK 
-		END
-		FETCH NEXT FROM product_cur INTO @ProductID, @OrderedQuantity, @OrderID
-	END
-	CLOSE product_cur
-	DEALLOCATE product_cur
+        DECLARE @ErrorMessage VARCHAR(MAX) = 'Sản phẩm không đủ so với số lượng tồn kho: '
+        SELECT @ErrorMessage += oos.ProductID + ', '
+        FROM @OutOfStockProducts oos
+
+        RAISERROR (@ErrorMessage, 16, 1)
+        ROLLBACK
+    END
 END
 GO
 
