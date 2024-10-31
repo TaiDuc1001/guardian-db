@@ -307,12 +307,14 @@ CREATE TABLE ProductOrder
 	OrderID VARCHAR(20),
 	ProductID VARCHAR(20),
 	Quantity SMALLINT DEFAULT 1,
+	StockAddressID VARCHAR(20),
 	Amount DECIMAL(20,2) DEFAULT 0,
 	VATAmount DECIMAL(20,2) DEFAULT 0,
 	AmountIncludeVAT AS (Amount + VATAmount),
 	CONSTRAINT FK_OrderID_ProductID2_VoucherID1 PRIMARY KEY (OrderID, ProductID),
 	CONSTRAINT FK_OrderID FOREIGN KEY (OrderID) REFERENCES Order_(OrderID),
-	CONSTRAINT FK_ProductID8 FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+	CONSTRAINT FK_ProductID8 FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
+	CONSTRAINT FK_StockAddressID FOREIGN KEY (StockAddressID) REFERENCES BranchWarehouse(BranchWID)
 )
 
 CREATE TABLE EventProducts
