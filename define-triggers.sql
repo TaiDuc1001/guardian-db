@@ -163,7 +163,6 @@ BEGIN
 END
 GO
 
-
 CREATE TRIGGER SetProductAmounts
 ON ProductOrder
 AFTER INSERT
