@@ -73,24 +73,46 @@ BEGIN
 END
 GO
 
-CREATE TRIGGER CalculateDiscountedAmount
-ON [dbo].[ProductOrder]
+CREATE TRIGGER CalculateVATAmounts
+ON ProductOrder
 AFTER INSERT, UPDATE
 AS
 BEGIN
-	UPDATE ProductOrder
-	SET Amount = ins.Quantity * pro.Price,
-		VATAmount = (ins.Quantity * pro.Price)*0.1,
-		AmountIncludeVAT = (ins.Quantity * pro.Price) * (1 + 0.1)
-	FROM ProductOrder po, Product pro, inserted ins
-	WHERE pro.ProductID = ins.ProductID
-	AND po.ProductID = ins.ProductID
-	AND pro.ProductID = po.ProductID	
+    DECLARE @OrderID VARCHAR(20), @ProductID VARCHAR(20), @Quantity INT, @Price DECIMAL(10, 0)
+    DECLARE @Amount DECIMAL(20, 0), @VATAmount DECIMAL(20, 0), @AmountIncludeVAT DECIMAL(20, 0)
+    
+    DECLARE cursor_order CURSOR FOR 
+        SELECT OrderID, ProductID, Quantity
+        FROM inserted
+
+    OPEN cursor_order
+
+    FETCH NEXT FROM cursor_order INTO @OrderID, @ProductID, @Quantity
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        -- Giả sử lấy giá từ bảng Product, bạn cần sửa nếu cần
+        SELECT @Price = Price FROM Product WHERE ProductID = @ProductID
+        SET @Amount = @Quantity * @Price
+        SET @VATAmount = @Amount * 0.1
+        SET @AmountIncludeVAT = @Amount + @VATAmount
+
+        UPDATE ProductOrder
+        SET Amount = @Amount,
+            VATAmount = @VATAmount
+        WHERE OrderID = @OrderID AND ProductID = @ProductID
+
+        FETCH NEXT FROM cursor_order INTO @OrderID, @ProductID, @Quantity
+    END
+
+    CLOSE cursor_order
+    DEALLOCATE cursor_order
 END
+
 GO
 
 CREATE TRIGGER UpdatePoints
-ON [dbo].[Order_]
+ON Order_
 AFTER INSERT, UPDATE
 AS
 BEGIN
@@ -98,9 +120,9 @@ BEGIN
     DECLARE @UserID VARCHAR(20);
 
    
-    SELECT @TotalPrice = o.[TotalPrice], @UserID = o.[UserID]
+    SELECT @TotalPrice = o.TotalPrice, @UserID = o.[UserID]
     FROM inserted o; 
-	UPDATE [dbo].[User_]
+	UPDATE User_
     SET [Point] = ROUND([Point] + @TotalPrice / 10000, -1)
     WHERE [UserID] = @UserID;
 END

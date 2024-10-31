@@ -52,7 +52,7 @@ CREATE TABLE Product
 	Unit NVARCHAR(10),
 	InstructionManualDescription NVARCHAR(500), 
 	InstructionStoreDescription NVARCHAR(500),
-	SoldCount INT,
+	SoldCount INT DEFAULT 0,
 	CONSTRAINT FK_CategoryID FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID),
 	CONSTRAINT FK_BrandID FOREIGN KEY (BrandID) REFERENCES Brand(BrandID)
 )
@@ -130,13 +130,20 @@ CREATE TABLE Voucher
 (
 	VoucherID VARCHAR(20) NOT NULL PRIMARY KEY,
 	VoucherCode VARCHAR(20) NOT NULL,
-	Name VARCHAR(50),
-	MinimumPrice INT DEFAULT 0,
-	DiscountPrice INT,
-	DiscountPercentage DECIMAL(2,0),
+	Name NVARCHAR(50),
+	MinimumDiscount DECIMAL(20,2) DEFAULT 0,
+	MaximumDiscountAmount DECIMAL(20,2) DEFAULT 0,
+	DiscountPrice INT DEFAULT NULL,
+	DiscountPercentage DECIMAL(2,0) DEFAULT NULL,
 	VoucherDescription NVARCHAR(500),
 	EventID VARCHAR(20),
-	CONSTRAINT FK_EventID1 FOREIGN KEY (EventID) REFERENCES Event(EventID)
+	CONSTRAINT FK_EventID1 FOREIGN KEY (EventID) REFERENCES Event(EventID),
+	CONSTRAINT CK_Discount CHECK (
+        (DiscountPrice IS NOT NULL OR DiscountPercentage IS NOT NULL) 
+        AND (DiscountPrice IS NULL OR DiscountPercentage IS NULL)
+		AND (DiscountPrice IS NULL OR DiscountPrice >= 0)
+		AND (DiscountPercentage IS NULL OR (DiscountPercentage >= 0 AND DiscountPercentage <= 100))
+    )
 )
 
 CREATE TABLE Review
@@ -171,7 +178,8 @@ CREATE TABLE Shipper
 CREATE TABLE Order_
 (
 	OrderID VARCHAR(20) NOT NULL PRIMARY KEY,
-	UserID VARCHAR(20),
+	UserID VARCHAR(20) NOT NULL,
+	PointUsed INT DEFAULT 0,
 	TotalPrice DECIMAL(20,2) DEFAULT 0,
 	DateOrdered DATE,
 	DeliveryAddressID VARCHAR(20),
@@ -344,11 +352,9 @@ CREATE TABLE Invoice
 	InvoiceNumber INT,
 	InvoiceDate DATE DEFAULT GETDATE(),
 	MCQT VARCHAR(20) NOT NULL,
-	BrandID VARCHAR(20),
 	UserID VARCHAR(20),
 	PaymentTermID VARCHAR(20),
 	Note NVARCHAR(500),
-	CONSTRAINT FK_BrandID1 FOREIGN KEY (BrandID) REFERENCES Brand (BrandID),
 	CONSTRAINT FK_UserID7 FOREIGN KEY (UserID) REFERENCES User_(UserID),
 	CONSTRAINT FK_PaymentTermID FOREIGN KEY (PaymentTermID) REFERENCES PaymentTerm (PaymentTermID)
 )
