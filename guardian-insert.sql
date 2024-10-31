@@ -301,7 +301,12 @@ VALUES
     ('P002', 'BW004', 6),
     ('P001', 'BW005', 4),
     ('P002', 'BW006', 10),
-    ('P004', 'BW007', 8);
+    ('P004', 'BW007', 8),
+    ('P005', 'BW007', 12),
+    ('P006', 'BW007', 15),
+    ('P007', 'BW007', 20),
+    ('P007', 'BW006', 25),
+    ('P008', 'BW007', 25);
 
 INSERT INTO Gift (
     MainProductID, GiftProductID, Quantity, StartDate, EndDate
