@@ -314,7 +314,7 @@ CREATE TABLE ProductOrder
 	CONSTRAINT FK_OrderID_ProductID2_VoucherID1 PRIMARY KEY (OrderID, ProductID),
 	CONSTRAINT FK_OrderID FOREIGN KEY (OrderID) REFERENCES Order_(OrderID),
 	CONSTRAINT FK_ProductID8 FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
-	CONSTRAINT FK_StockAddressID FOREIGN KEY (StockAddressID) REFERENCES BranchWarehouse(BranchWID)
+	CONSTRAINT FK_StockAddressID FOREIGN KEY (StockAddressID) REFERENCES Address(AddressID)
 )
 
 CREATE TABLE EventProducts
