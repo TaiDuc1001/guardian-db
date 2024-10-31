@@ -370,7 +370,7 @@ CREATE TABLE Genre
 			N'Xã hội',
 			N'Văn hóa',
 			N'Giáo dục',
-			N'Khoa học'
+			N'Giới tính'
 		)
 	)
 )
