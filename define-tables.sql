@@ -189,7 +189,7 @@ CREATE TABLE Order_
 	ShippingFeeIncludeVAT AS (ShippingFee + ShippingVATAmount),
 	FinalAmount DECIMAL(20,2) DEFAULT 0,
 	FinalVATAmount DECIMAL(20,2) DEFAULT 0,
-	FinalAmountIncludeVAT DECIMAL(20,2) DEFAULT 0,
+	FinalAmountIncludeVAT AS (FinalAmount + FinalVATAmount),
 	CONSTRAINT FK_UserID2 FOREIGN KEY (UserID) REFERENCES User_(UserID),
 	CONSTRAINT FK_AddressID FOREIGN KEY (DeliveryAddressID) REFERENCES Address(AddressID),
 	CONSTRAINT FK_VoucherID1 FOREIGN KEY (VoucherID) REFERENCES Voucher(VoucherID)
