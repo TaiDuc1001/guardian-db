@@ -73,6 +73,27 @@ BEGIN
 END
 GO
 
+CREATE TRIGGER HandleVoucherMismatch
+ON Order_
+AFTER INSERT
+AS
+BEGIN
+	IF EXISTS
+	(
+		SELECT 1
+		FROM inserted ins
+		JOIN ProductOrder po ON po.OrderID = ins.OrderID
+		JOIN VoucherProducts vps ON vps.VoucherID = ins.VoucherID
+		WHERE po.ProductID != vps.ProductID
+	)
+
+	BEGIN
+		PRINT N'Voucher này không hợp lệ'
+		ROLLBACK
+	END
+END
+GO
+
 CREATE TRIGGER OrderTrigger
 ON Order_
 AFTER INSERT, UPDATE
