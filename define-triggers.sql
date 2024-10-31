@@ -189,3 +189,30 @@ BEGIN
 		inserted ins ON o.OrderID = ins.OrderID
 END
 GO
+CREATE TRIGGER ReturnItemToStock
+ON ShipperOrder
+AFTER UPDATE
+AS
+BEGIN
+	DECLARE @Quantity INT;
+	DECLARE @DecresedPoint INT
+
+	UPDATE BWP
+	SET BWP.StockQuantity = BWP.StockQuantity + po.Quantity
+	FROM BranchW_Product BWP
+	JOIN ProductOrder po ON BWP.ProductID = po.ProductID
+	JOIN inserted ins ON po.OrderID = ins.OrderID AND ins.StatusID = 'S005'
+ 
+	
+	UPDATE u
+	SET u.Point =
+	CASE 
+	WHEN (u.Point - o.PointUsed) < 0 THEN 0
+	ELSE (u.Point - o.PointUsed)
+	END
+	FROM User_ u 
+	JOIN Order_ o ON o.UserID = u.UserID
+	JOIN inserted ins ON ins.OrderID = o.OrderID AND ins.StatusID = 'S005'
+	
+END
+go
