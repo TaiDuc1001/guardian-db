@@ -73,7 +73,6 @@ BEGIN
 END
 GO
 
-
 CREATE TRIGGER HandleVoucherMismatch
 ON Order_
 AFTER INSERT
