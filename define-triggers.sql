@@ -163,5 +163,49 @@ BEGIN
 		FROM Product pro
 		INNER JOIN inserted ins on ins.ProductID = pro.ProductID
 
+	-- Include logic from CreateDeltaProduct trigger here
+	UPDATE po
+	SET 
+		po.Quantity = 1,
+		po.Amount = (r.RateValue * o.TotalPrice) - 
+			CASE
+				WHEN v.DiscountPrice IS NULL THEN v.DiscountPercentage * o.TotalPrice
+				WHEN v.DiscountPrice > v.MaximumDiscountAmount THEN v.MaximumDiscountAmount
+				ELSE v.DiscountPrice
+			END,
+		po.VATAmount = 0
+	FROM 
+		ProductOrder po
+	INNER JOIN 
+		Order_ o ON po.OrderID = o.OrderID
+	INNER JOIN 
+		Voucher v ON o.VoucherID = v.VoucherID
+	INNER JOIN 
+		Rate r ON r.RateID = 'TAX001'
+	WHERE 
+		po.ProductID = 'P000'
+		AND NOT EXISTS (SELECT 1 FROM inserted ins WHERE po.OrderID = ins.OrderID AND po.ProductID = 'P000');
+
+	INSERT INTO ProductOrder (OrderID, ProductID, Quantity, Amount, VATAmount)
+	SELECT
+		o.OrderID,
+		N'P000',
+		1,
+		(r.RateValue * o.TotalPrice) - 
+			CASE
+				WHEN v.DiscountPrice IS NULL THEN v.DiscountPercentage * o.TotalPrice
+				WHEN v.DiscountPrice > v.MaximumDiscountAmount THEN v.MaximumDiscountAmount
+				ELSE v.DiscountPrice
+			END,
+		0
+	FROM
+		Order_ o
+	INNER JOIN
+		Voucher v ON o.VoucherID = v.VoucherID
+	INNER JOIN 
+		Rate r ON r.RateID = 'TAX001'
+	WHERE 
+		o.OrderID IN (SELECT OrderID FROM inserted)
+		AND NOT EXISTS (SELECT 1 FROM ProductOrder po WHERE po.OrderID = o.OrderID AND po.ProductID = 'P000')
 END
 GO
