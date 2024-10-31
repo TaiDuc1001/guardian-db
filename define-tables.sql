@@ -189,7 +189,7 @@ CREATE TABLE Order_
 	ShippingFeeIncludeVAT AS (ShippingFee + ShippingVATAmount),
 	FinalAmount DECIMAL(20,2) DEFAULT 0,
 	FinalVATAmount AS (FinalAmount * 0.1),
-	FinalAmountIncludeVAT AS (FinalAmount + FinalVATAmount),
+	FinalAmountIncludeVAT AS (FinalAmount * 1.1),
 	CONSTRAINT FK_UserID2 FOREIGN KEY (UserID) REFERENCES User_(UserID),
 	CONSTRAINT FK_AddressID FOREIGN KEY (DeliveryAddressID) REFERENCES Address(AddressID),
 	CONSTRAINT FK_VoucherID1 FOREIGN KEY (VoucherID) REFERENCES Voucher(VoucherID)
@@ -309,7 +309,7 @@ CREATE TABLE ProductOrder
 	Quantity SMALLINT DEFAULT 1,
 	Amount DECIMAL(20,2) DEFAULT 0,
 	VATAmount AS (Amount * 0.1),
-	AmountIncludeVAT AS (Amount + VATAmount),
+	AmountIncludeVAT AS (Amount * 1.1),
 	CONSTRAINT FK_OrderID_ProductID2_VoucherID1 PRIMARY KEY (OrderID, ProductID),
 	CONSTRAINT FK_OrderID FOREIGN KEY (OrderID) REFERENCES Order_(OrderID),
 	CONSTRAINT FK_ProductID8 FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
