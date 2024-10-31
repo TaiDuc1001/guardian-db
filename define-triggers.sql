@@ -148,13 +148,13 @@ BEGIN
 	UPDATE po
 	SET 
 		po.Quantity = 1,
-		po.Amount = (r.RateValue * o.TotalPrice) - 
+		po.Amount = (r.RateValue * o.TotalPrice) - o.PointUsed * 12 - 
 			CASE
 				WHEN v.DiscountPrice IS NULL THEN v.DiscountPercentage * o.TotalPrice
 				WHEN v.DiscountPrice > v.MaximumDiscountAmount THEN v.MaximumDiscountAmount
 				ELSE v.DiscountPrice
 			END,
-		po.VATAmount = 0
+		po.VATAmount = po.VATAmount
 	FROM 
 		ProductOrder po
 	INNER JOIN 
@@ -193,6 +193,12 @@ BEGIN
 	SET o.FinalAmount = o.TotalPrice + (SELECT po.Amount
             FROM ProductOrder po
             WHERE po.OrderID = o.OrderID AND po.ProductID = 'P000')
+	FROM Order_ o
+	INNER JOIN
+		inserted ins ON o.OrderID = ins.OrderID
+
+	UPDATE o
+	SET o.FinalVATAmount = o.FinalAmount * @VATRate
 	FROM Order_ o
 	INNER JOIN
 		inserted ins ON o.OrderID = ins.OrderID
