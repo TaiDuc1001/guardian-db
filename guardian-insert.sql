@@ -293,15 +293,15 @@ INSERT INTO BranchW_Product (
     ProductID, BranchWID, StockQuantity
 )
 VALUES 
-    ('P001', 'BW001', 50),
-    ('P002', 'BW001', 30),
-    ('P003', 'BW002', 70),
-    ('P001', 'BW003', 90),
-    ('P004', 'BW003', 20),
-    ('P002', 'BW004', 60),
-    ('P001', 'BW005', 40),
-    ('P002', 'BW006', 100),
-    ('P004', 'BW007', 80);
+    ('P001', 'BW001', 5),
+    ('P002', 'BW001', 3),
+    ('P003', 'BW002', 7),
+    ('P001', 'BW003', 9),
+    ('P004', 'BW003', 2),
+    ('P002', 'BW004', 6),
+    ('P001', 'BW005', 4),
+    ('P002', 'BW006', 10),
+    ('P004', 'BW007', 8);
 
 INSERT INTO Gift (
     MainProductID, GiftProductID, Quantity, StartDate, EndDate
